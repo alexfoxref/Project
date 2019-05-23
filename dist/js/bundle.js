@@ -183,7 +183,7 @@ var animation = function animation() {
       feedColored = document.querySelector('.feed .colored'),
       scheduleWrapper = document.querySelector('.schedule__wrapper'),
       showupWrapper = document.querySelector('.showup__wrapper'),
-      showupContent = document.querySelector('.showup__content');
+      showupContent = document.querySelector('.showup__content'); // Анимация появления
 
   var fadeWithDelay = function fadeWithDelay(elem) {
     elem.classList.add('fade');
@@ -246,11 +246,15 @@ var navigation = function navigation() {
 
   showPage(currentPage); //смена экранов
 
+  sidecontrol.forEach(function (item) {
+    item.style.zIndex = '20';
+    item.querySelector('a').style.zIndex = '30';
+  });
   document.body.addEventListener('click', function (event) {
-    if (event.target == sidecontrol[currentPage - 1].querySelector('a') || event.target == sidecontrol[currentPage - 1].querySelector('svg') || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[1]) {
+    if (event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[1]) {
       currentPage = 1;
       showPage(currentPage);
-    } else {
+    } else if (event.target == sidecontrol[currentPage - 1] || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls') || event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[1] || event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[1] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[2] || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-count') || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-show')) {
       if (currentPage < page.children.length) {
         currentPage++;
         showPage(currentPage);
@@ -259,7 +263,7 @@ var navigation = function navigation() {
         showPage(currentPage);
       }
     }
-  }); // document.querySelector('.difference__info').classList.add('fade');
+  });
 };
 
 module.exports = navigation;

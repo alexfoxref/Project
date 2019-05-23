@@ -10,6 +10,7 @@ let animation = () => {
         showupWrapper = document.querySelector('.showup__wrapper'),
         showupContent = document.querySelector('.showup__content');
 
+    // Анимация появления
     let fadeWithDelay = (elem) => {
         elem.classList.add('fade');
     }

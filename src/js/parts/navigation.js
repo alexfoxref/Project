@@ -34,14 +34,24 @@ let navigation = () => {
     }
     showPage(currentPage);
     //смена экранов
+    sidecontrol.forEach(item => {
+        item.style.zIndex = '20';
+        item.querySelector('a').style.zIndex = '30'
+    })
     document.body.addEventListener('click', event => {
-        if (event.target == sidecontrol[currentPage - 1].querySelector('a') ||
-                event.target == sidecontrol[currentPage - 1].querySelector('svg') ||
+        if (event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[0] ||
+                event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[0] ||
                 event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[0] ||
                 event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[1]) {
             currentPage = 1;
             showPage(currentPage);
-        } else {
+        } else if (event.target == sidecontrol[currentPage - 1] ||
+                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls') ||
+                event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[1] ||
+                event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[1] ||
+                event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[2] ||
+                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-count') ||
+                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-show')){
             if (currentPage < page.children.length) {
                 currentPage++;
                 showPage(currentPage);
@@ -51,8 +61,6 @@ let navigation = () => {
             }
         }
     });    
-
-    // document.querySelector('.difference__info').classList.add('fade');
 
 }
 
