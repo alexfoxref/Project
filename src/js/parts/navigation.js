@@ -7,15 +7,15 @@ let navigation = () => {
     let currentPage = 1;
 
     //Отображение элементов страницы
-    if (page.getBoundingClientRect().height < 960) {
-        page.style.height = '960px';
-        window.addEventListener('scroll', () => {
-            sidecontrol.forEach(item => {
-                item.style.top = `${document.documentElement.scrollTop}px`;
-            });
-        });
-        showupContent.style.position = 'fixed';
-    }
+    // if (page.getBoundingClientRect().height < 960) {
+    //     page.style.height = '960px';
+    //     window.addEventListener('scroll', () => {
+    //         sidecontrol.forEach(item => {
+    //             item.style.top = `${document.documentElement.scrollTop}px`;
+    //         });
+    //     });
+    //     showupContent.style.position = 'fixed';
+    // }
     //Показать нужную страницу
     let showPage = (n) => {
         let pageNames = [];
@@ -34,6 +34,7 @@ let navigation = () => {
     }
     showPage(currentPage);
     //смена экранов
+    //поднимаем контрольную панель выше страниц
     sidecontrol.forEach(item => {
         item.style.zIndex = '20';
         item.querySelector('a').style.zIndex = '30'

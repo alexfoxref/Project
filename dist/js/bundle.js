@@ -217,17 +217,16 @@ var navigation = function navigation() {
       sidecontrol = document.querySelectorAll('.sidecontrol'),
       showupContent = document.querySelector('.showup__content');
   var currentPage = 1; //Отображение элементов страницы
-
-  if (page.getBoundingClientRect().height < 960) {
-    page.style.height = '960px';
-    window.addEventListener('scroll', function () {
-      sidecontrol.forEach(function (item) {
-        item.style.top = "".concat(document.documentElement.scrollTop, "px");
-      });
-    });
-    showupContent.style.position = 'fixed';
-  } //Показать нужную страницу
-
+  // if (page.getBoundingClientRect().height < 960) {
+  //     page.style.height = '960px';
+  //     window.addEventListener('scroll', () => {
+  //         sidecontrol.forEach(item => {
+  //             item.style.top = `${document.documentElement.scrollTop}px`;
+  //         });
+  //     });
+  //     showupContent.style.position = 'fixed';
+  // }
+  //Показать нужную страницу
 
   var showPage = function showPage(n) {
     var pageNames = [];
@@ -245,6 +244,7 @@ var navigation = function navigation() {
   };
 
   showPage(currentPage); //смена экранов
+  //поднимаем контрольную панель выше страниц
 
   sidecontrol.forEach(function (item) {
     item.style.zIndex = '20';
