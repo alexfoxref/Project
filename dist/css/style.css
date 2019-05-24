@@ -276,6 +276,7 @@ a {
     height: 307px;
     background-color: #2546bc;
     position: absolute;
+    z-index: 10;
     bottom: 0;
     left: 84px;
     padding: 40px 0 40px 63px; }
@@ -378,18 +379,9 @@ a {
         padding: 32px;
         padding-top: 100px;
         overflow: hidden;
-        transition: 0.5s all;
         margin-right: 24px;
         cursor: pointer;
         box-shadow: 0 0px 20px rgba(0, 0, 0, 0.5); }
-        .showup__content-slider .card:hover {
-          padding-top: 32px; }
-          .showup__content-slider .card:hover .card__controls-arrow {
-            opacity: 1; }
-          .showup__content-slider .card:hover .card__title {
-            opacity: 1; }
-          .showup__content-slider .card:hover .card__description {
-            opacity: .5; }
         .showup__content-slider .card__controls {
           width: 100%;
           display: flex;

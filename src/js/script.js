@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     let navigation = require('./parts/navigation'),
-        animation = require('./parts/animation');
+        slider = require('./parts/slider');
 
     let currentPage;
     if (window.location.href.match(/#\d/)) {
@@ -16,5 +16,5 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     navigation(currentPage);
-    animation();
+    slider();
 })

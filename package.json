@@ -13,6 +13,7 @@
     "@babel/preset-env": "^7.4.5",
     "babel-loader": "^8.0.6",
     "babel-plugin-es6-promise": "^1.1.1",
+    "es6-promise": "^4.2.6",
     "formdata-polyfill": "^3.0.18",
     "gulp": "^4.0.2",
     "gulp-sass": "^4.0.2",

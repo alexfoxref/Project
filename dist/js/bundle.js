@@ -166,19 +166,6 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/js/parts/animation.js":
-/*!***********************************!*\
-  !*** ./src/js/parts/animation.js ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-var animation = function animation() {};
-
-module.exports = animation;
-
-/***/ }),
-
 /***/ "./src/js/parts/navigation.js":
 /*!************************************!*\
   !*** ./src/js/parts/navigation.js ***!
@@ -267,7 +254,7 @@ var navigation = function navigation(currentPage) {
         }
       });
 
-      if (moduleControl) {
+      if (moduleControl.length > 0) {
         movePage(moduleControl[currentPage - 1].querySelector('.prev'), -1);
         movePage(moduleControl[currentPage - 1].querySelector('.next'), 1);
         setNum(currentPage);
@@ -292,16 +279,18 @@ var navigation = function navigation(currentPage) {
     }); // переход по слайдам на слайдере первого экрана
 
     slider.addEventListener('click', function (event) {
-      slider.querySelectorAll('.showup__content-slider .card').forEach(function (itemCard, indexCard) {
-        for (var i = 0; i < itemCard.querySelectorAll('*').length; i++) {
-          if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
-            var pageLink = indexCard + 1;
-            console.log('+');
-            var link = document.createElement('a');
-            link.setAttribute('href', "modules.html#".concat(pageLink));
-            link.click();
-            link.remove();
-            break;
+      slider.querySelectorAll('.showup__content-slider .card').forEach(function (itemCard) {
+        if (!itemCard.classList.contains('onmove')) {
+          for (var i = 0; i < itemCard.querySelectorAll('*').length; i++) {
+            if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
+              event.preventDefault();
+              var pageLink = +itemCard.getAttribute('href').slice(-1);
+              var link = document.createElement('a');
+              link.setAttribute('href', "modules.html#".concat(pageLink));
+              link.click();
+              link.remove();
+              break;
+            }
           }
         }
       });
@@ -313,6 +302,105 @@ var navigation = function navigation(currentPage) {
 };
 
 module.exports = navigation;
+
+/***/ }),
+
+/***/ "./src/js/parts/slider.js":
+/*!********************************!*\
+  !*** ./src/js/parts/slider.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var slider = function slider() {
+  var slides = document.querySelectorAll('.showup__content-slider .card'),
+      slider = document.querySelector('.showup__content-slider'),
+      width = slider.querySelector('.card:nth-child(2)').getBoundingClientRect().left - slider.querySelector('.card:nth-child(1)').getBoundingClientRect().left; //функция для делегирования события на элемент со всеми его потомками
+
+  var clickElem = function clickElem(elem, func) {
+    for (var i = 0; i < elem.querySelectorAll('*').length; i++) {
+      if (event.target == elem || event.target == elem.querySelectorAll('*')[i]) {
+        func();
+        break;
+      }
+    }
+  }; // перемещение слайдов
+
+
+  var moveSlide = function moveSlide(n) {
+    // запретим по классу onmove нажатие на контрольные кнопки и на ссылку первого слайда
+    document.querySelector('.showup__content-btns').classList.add('onmove');
+
+    if (n > 0) {
+      // при нажатии на next последний элемент добавляем в начало и причесываем классы
+      slider.insertBefore(slider.querySelector('.card:last-child'), slider.querySelector('.card:first-child'));
+      slider.querySelector('.card:first-child').style.marginLeft = "-".concat(width, "px");
+      slider.querySelector('.card:first-child').style.opacity = '0';
+      slider.querySelector('.card:first-child').classList.add('onmove');
+      slider.querySelector('.card:first-child').classList.add('card-active');
+      slider.querySelector('.card:nth-child(2)').classList.remove('card-active'); // анимация для next
+
+      var countNext = +"-".concat(width),
+          countFade = 0;
+
+      var frameNext = function frameNext() {
+        slider.querySelector('.card:first-child').style.marginLeft = "".concat(countNext += parseFloat(width / 50 * n), "px");
+        slider.querySelector('.card:first-child').style.opacity = "".concat(countFade += parseFloat(1 / 50 * n));
+
+        if (countNext >= 0) {
+          slider.querySelector('.card:first-child').style.marginLeft = '0';
+          clearInterval(moveNextAnimation);
+          slider.querySelector('.card:first-child').classList.remove('onmove');
+          document.querySelector('.showup__content-btns').classList.remove('onmove');
+        }
+      };
+
+      var moveNextAnimation = setInterval(frameNext, 10);
+    } else if (n < 0) {
+      // при нажатии на prev сначала делаем анимацию, а затем перемещение первого слайда в конец
+      slider.querySelector('.card:first-child').style.marginLeft = "0";
+      slider.querySelector('.card:first-child').style.opacity = '1';
+      slider.querySelector('.card:first-child').classList.add('onmove');
+      slider.querySelector('.card:first-child').classList.remove('card-active');
+      slider.querySelector('.card:nth-child(2)').classList.add('card-active'); // анимация для prev
+
+      var countPrev = 0,
+          countHide = 1;
+
+      var framePrev = function framePrev() {
+        slider.querySelector('.card:first-child').style.marginLeft = "".concat(countPrev += parseFloat(width / 50 * n), "px");
+        slider.querySelector('.card:first-child').style.opacity = "".concat(countHide += parseFloat(1 / 50 * n));
+
+        if (countPrev <= -width) {
+          clearInterval(movePrevAnimation);
+          slider.querySelector('.card:first-child').classList.remove('onmove');
+          slider.querySelector('.card:first-child').style.marginLeft = "0";
+          slider.querySelector('.card:first-child').style.opacity = '1';
+          slider.appendChild(slider.querySelector('.card:first-child'));
+          document.querySelector('.showup__content-btns').classList.remove('onmove');
+        }
+      };
+
+      var movePrevAnimation = setInterval(framePrev, 10);
+    }
+  }; //если слайды есть и на кнопках не висит onmove, то по клику на кнопки перемещаем слайды
+
+
+  if (slides.length > 0) {
+    document.querySelector('.showup__content-btns').addEventListener('click', function (event) {
+      if (!document.querySelector('.showup__content-btns').classList.contains('onmove')) {
+        clickElem(document.querySelector('.showup__content-btns .slick-prev'), function () {
+          moveSlide(-1);
+        });
+        clickElem(document.querySelector('.showup__content-btns .slick-next'), function () {
+          moveSlide(1);
+        });
+      }
+    });
+  }
+};
+
+module.exports = slider;
 
 /***/ }),
 
@@ -331,7 +419,7 @@ window.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
-      animation = __webpack_require__(/*! ./parts/animation */ "./src/js/parts/animation.js");
+      slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js");
 
   var currentPage;
 
@@ -342,7 +430,7 @@ window.addEventListener('DOMContentLoaded', function () {
   }
 
   navigation(currentPage);
-  animation();
+  slider();
 });
 
 /***/ })

@@ -82,7 +82,7 @@ let navigation = (currentPage) => {
                 }
             });
 
-            if (moduleControl) {
+            if (moduleControl.length > 0) {
                 movePage(moduleControl[currentPage - 1].querySelector('.prev'), -1);
                 movePage(moduleControl[currentPage - 1].querySelector('.next'), 1);
                 setNum(currentPage);
@@ -105,16 +105,18 @@ let navigation = (currentPage) => {
         });
         // переход по слайдам на слайдере первого экрана
         slider.addEventListener('click', (event) => {
-            slider.querySelectorAll('.showup__content-slider .card').forEach((itemCard,indexCard) => {
-                for (let i = 0; i < itemCard.querySelectorAll('*').length; i++) {
-                    if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
-                        let pageLink = indexCard + 1;
-                        console.log('+');
-                        let link = document.createElement('a');
-                        link.setAttribute('href', `modules.html#${pageLink}`);
-                        link.click();
-                        link.remove();
-                        break;
+            slider.querySelectorAll('.showup__content-slider .card').forEach(itemCard => {
+                if (!itemCard.classList.contains('onmove')) {
+                    for (let i = 0; i < itemCard.querySelectorAll('*').length; i++) {
+                        if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
+                            event.preventDefault();
+                            let pageLink = +itemCard.getAttribute('href').slice(-1);
+                            let link = document.createElement('a');
+                            link.setAttribute('href', `modules.html#${pageLink}`);
+                            link.click();
+                            link.remove();
+                            break;
+                        }
                     }
                 }
             })
