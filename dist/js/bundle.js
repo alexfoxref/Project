@@ -173,33 +173,7 @@ module.exports = g;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var animation = function animation() {
-  var difInfoCards = document.querySelector('.difference__info-cards'),
-      difPhoto = document.querySelector('.difference__photo'),
-      modInfo = document.querySelector('.modules__info'),
-      joinIntro = document.querySelector('.join__intro'),
-      joinEvolution = document.querySelector('.join__evolution'),
-      feedTitle = document.querySelector('.feed .title'),
-      feedColored = document.querySelector('.feed .colored'),
-      scheduleWrapper = document.querySelector('.schedule__wrapper'),
-      showupWrapper = document.querySelector('.showup__wrapper'),
-      showupContent = document.querySelector('.showup__content'); // Анимация появления
-
-  var fadeWithDelay = function fadeWithDelay(elem) {
-    elem.classList.add('fade');
-  };
-
-  fadeWithDelay(difInfoCards);
-  fadeWithDelay(difPhoto);
-  fadeWithDelay(modInfo);
-  fadeWithDelay(joinIntro);
-  fadeWithDelay(joinEvolution);
-  fadeWithDelay(feedTitle);
-  fadeWithDelay(feedColored);
-  fadeWithDelay(scheduleWrapper);
-  fadeWithDelay(showupWrapper);
-  fadeWithDelay(showupContent);
-};
+var animation = function animation() {};
 
 module.exports = animation;
 
@@ -212,58 +186,130 @@ module.exports = animation;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var navigation = function navigation() {
+var navigation = function navigation(currentPage) {
   var page = document.querySelector('.page'),
       sidecontrol = document.querySelectorAll('.sidecontrol'),
-      showupContent = document.querySelector('.showup__content');
-  var currentPage = 1; //Отображение элементов страницы
-  // if (page.getBoundingClientRect().height < 960) {
-  //     page.style.height = '960px';
-  //     window.addEventListener('scroll', () => {
-  //         sidecontrol.forEach(item => {
-  //             item.style.top = `${document.documentElement.scrollTop}px`;
-  //         });
-  //     });
-  //     showupContent.style.position = 'fixed';
-  // }
-  //Показать нужную страницу
+      moduleapp = document.querySelector('.moduleapp'),
+      plus = document.querySelector('.showup__content-explore .plus'),
+      slider = document.querySelector('.showup__content-slider'),
+      moduleControl = document.querySelectorAll('.module__info-controls'); // установка значений страниц на навигационной панели
 
-  var showPage = function showPage(n) {
-    var pageNames = [];
-    page.childNodes.forEach(function (item) {
-      if (item.classList) {
-        pageNames.push(item.className);
-      }
-    }); // скрываем все страницы
-
-    pageNames.forEach(function (item) {
-      document.querySelector(".".concat(item)).style.display = 'none';
-    }); // показываем нужную страницу
-
-    document.querySelector(".".concat(pageNames[n - 1])).style.display = 'block';
+  var setNum = function setNum(currentPage) {
+    if (currentPage == 1) {
+      moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = "0".concat(moduleapp.children.length);
+      moduleControl[currentPage - 1].querySelector('.next__counter').textContent = "0".concat(currentPage + 1);
+    } else if (currentPage == moduleapp.children.length) {
+      moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = "0".concat(currentPage - 1);
+      moduleControl[currentPage - 1].querySelector('.next__counter').textContent = "0".concat(1);
+    } else {
+      moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = "0".concat(currentPage - 1);
+      moduleControl[currentPage - 1].querySelector('.next__counter').textContent = "0".concat(currentPage + 1);
+    }
   };
 
-  showPage(currentPage); //смена экранов
-  //поднимаем контрольную панель выше страниц
+  var loadContent = function loadContent(page, currentPage) {
+    //Показать нужную страницу
+    var showPage = function showPage(n) {
+      var pageNames = document.querySelectorAll(".".concat(page.className, " > *")); // скрываем все страницы
 
-  sidecontrol.forEach(function (item) {
-    item.style.zIndex = '20';
-    item.querySelector('a').style.zIndex = '30';
-  });
-  document.body.addEventListener('click', function (event) {
-    if (event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[0] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[1]) {
-      currentPage = 1;
-      showPage(currentPage);
-    } else if (event.target == sidecontrol[currentPage - 1] || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls') || event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[1] || event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[1] || event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[2] || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-count') || event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-show')) {
-      if (currentPage < page.children.length) {
-        currentPage++;
-        showPage(currentPage);
-      } else {
-        currentPage = 1;
-        showPage(currentPage);
+      pageNames.forEach(function (item) {
+        item.classList.add('hidePage');
+        item.classList.remove('activePage');
+      }); // показываем нужную страницу
+
+      pageNames[n - 1].classList.add('activePage');
+      pageNames[n - 1].classList.remove('hidePage');
+    };
+
+    showPage(currentPage); //смена экранов
+    //поднимаем контрольную панель выше страниц
+
+    sidecontrol.forEach(function (item) {
+      item.style.zIndex = '20';
+      item.querySelector('a').style.zIndex = '30';
+    }); //делегируем события на элементы боковой панели и на нижнюю панель навигации
+
+    document.body.addEventListener('click', function (event) {
+      var movePage = function movePage(elem, n) {
+        for (var i = 0; i < elem.querySelectorAll('*').length; i++) {
+          if (event.target == elem || event.target == elem.querySelectorAll('*')[i]) {
+            currentPage = currentPage + n;
+
+            if (currentPage >= 1 && currentPage <= page.children.length) {
+              showPage(currentPage);
+            } else if (currentPage < 1) {
+              currentPage = page.children.length;
+              showPage(currentPage);
+            } else {
+              currentPage = 1;
+              showPage(currentPage);
+            }
+
+            break;
+          }
+        }
+      };
+
+      sidecontrol[currentPage - 1].querySelectorAll('*').forEach(function (itemAll) {
+        if (event.target == sidecontrol[currentPage - 1] || event.target == itemAll) {
+          var icon = sidecontrol[currentPage - 1].querySelectorAll('a')[0];
+          icon.querySelectorAll('*').forEach(function (item) {
+            if (event.target == icon || event.target == item) {
+              event.preventDefault();
+              var link = document.createElement('a');
+              link.setAttribute('href', 'index.html');
+              link.click();
+              link.remove();
+            }
+          });
+          var arrow = sidecontrol[currentPage - 1].querySelectorAll('a')[1];
+          movePage(arrow, 1);
+        }
+      });
+
+      if (moduleControl) {
+        movePage(moduleControl[currentPage - 1].querySelector('.prev'), -1);
+        movePage(moduleControl[currentPage - 1].querySelector('.next'), 1);
+        setNum(currentPage);
       }
-    }
-  });
+
+      ;
+    });
+  };
+
+  if (page) {
+    loadContent(page, 1); // переход по плюсику на слайдере первого экрана
+
+    document.body.addEventListener('click', function (event) {
+      plus.querySelectorAll('*').forEach(function (item) {
+        if (event.target == item || event.target == plus) {
+          var link = document.createElement('a');
+          link.setAttribute('href', 'modules.html');
+          link.click();
+          link.remove();
+        }
+      });
+    }); // переход по слайдам на слайдере первого экрана
+
+    slider.addEventListener('click', function (event) {
+      slider.querySelectorAll('.showup__content-slider .card').forEach(function (itemCard, indexCard) {
+        for (var i = 0; i < itemCard.querySelectorAll('*').length; i++) {
+          if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
+            var pageLink = indexCard + 1;
+            console.log('+');
+            var link = document.createElement('a');
+            link.setAttribute('href', "modules.html#".concat(pageLink));
+            link.click();
+            link.remove();
+            break;
+          }
+        }
+      });
+    });
+  } else if (moduleapp) {
+    loadContent(moduleapp, currentPage);
+    setNum(currentPage);
+  }
 };
 
 module.exports = navigation;
@@ -287,7 +333,15 @@ window.addEventListener('DOMContentLoaded', function () {
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
       animation = __webpack_require__(/*! ./parts/animation */ "./src/js/parts/animation.js");
 
-  navigation();
+  var currentPage;
+
+  if (window.location.href.match(/#\d/)) {
+    currentPage = +window.location.href.slice(-1);
+  } else {
+    currentPage = 1;
+  }
+
+  navigation(currentPage);
   animation();
 });
 

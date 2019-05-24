@@ -1,68 +1,128 @@
-let navigation = () => {
+let navigation = (currentPage) => {
 
     const page = document.querySelector('.page'),
         sidecontrol = document.querySelectorAll('.sidecontrol'),
-        showupContent = document.querySelector('.showup__content');
+        moduleapp = document.querySelector('.moduleapp'),
+        plus = document.querySelector('.showup__content-explore .plus'),
+        slider = document.querySelector('.showup__content-slider'),
+        moduleControl = document.querySelectorAll('.module__info-controls');
 
-    let currentPage = 1;
-
-    //Отображение элементов страницы
-    // if (page.getBoundingClientRect().height < 960) {
-    //     page.style.height = '960px';
-    //     window.addEventListener('scroll', () => {
-    //         sidecontrol.forEach(item => {
-    //             item.style.top = `${document.documentElement.scrollTop}px`;
-    //         });
-    //     });
-    //     showupContent.style.position = 'fixed';
-    // }
-    //Показать нужную страницу
-    let showPage = (n) => {
-        let pageNames = [];
-
-        page.childNodes.forEach(item => {
-            if (item.classList) {
-                pageNames.push(item.className);
-            }
-        });
-        // скрываем все страницы
-        pageNames.forEach(item => {
-            document.querySelector(`.${item}`).style.display = 'none';
-        });
-        // показываем нужную страницу
-        document.querySelector(`.${pageNames[n - 1]}`).style.display = 'block';
-    }
-    showPage(currentPage);
-    //смена экранов
-    //поднимаем контрольную панель выше страниц
-    sidecontrol.forEach(item => {
-        item.style.zIndex = '20';
-        item.querySelector('a').style.zIndex = '30'
-    })
-    document.body.addEventListener('click', event => {
-        if (event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[0] ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[0] ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[0] ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[1]) {
-            currentPage = 1;
-            showPage(currentPage);
-        } else if (event.target == sidecontrol[currentPage - 1] ||
-                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls') ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('a')[1] ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('svg')[1] ||
-                event.target == sidecontrol[currentPage - 1].querySelectorAll('path')[2] ||
-                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-count') ||
-                event.target == sidecontrol[currentPage - 1].querySelector('.sidecontrol__controls-show')){
-            if (currentPage < page.children.length) {
-                currentPage++;
-                showPage(currentPage);
-            } else {
-                currentPage = 1;
-                showPage(currentPage);
-            }
+    // установка значений страниц на навигационной панели
+    let setNum = (currentPage) => {
+        if (currentPage == 1) {
+            moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = `0${moduleapp.children.length}`;
+            moduleControl[currentPage - 1].querySelector('.next__counter').textContent = `0${currentPage + 1}`;
+        } else if (currentPage == moduleapp.children.length) {
+            moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = `0${currentPage - 1}`;
+            moduleControl[currentPage - 1].querySelector('.next__counter').textContent = `0${1}`;
+        } else {
+            moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = `0${currentPage - 1}`;
+            moduleControl[currentPage - 1].querySelector('.next__counter').textContent = `0${currentPage + 1}`;
         }
-    });    
+    }
 
+    let loadContent = (page, currentPage) => {
+        //Показать нужную страницу
+        let showPage = (n) => {
+            let pageNames = document.querySelectorAll(`.${page.className} > *`);
+    
+            // скрываем все страницы
+            pageNames.forEach(item => {
+                item.classList.add('hidePage');
+                item.classList.remove('activePage');
+            });
+
+            // показываем нужную страницу
+            pageNames[n - 1].classList.add('activePage');
+            pageNames[n - 1].classList.remove('hidePage');
+        }
+        showPage(currentPage);
+        //смена экранов
+        //поднимаем контрольную панель выше страниц
+        sidecontrol.forEach(item => {
+            item.style.zIndex = '20';
+            item.querySelector('a').style.zIndex = '30'
+        })
+        //делегируем события на элементы боковой панели и на нижнюю панель навигации
+        document.body.addEventListener('click', event => {
+
+            let movePage = (elem, n) => {
+                for (let i = 0; i < elem.querySelectorAll('*').length; i++) {
+                    if (event.target == elem || event.target == elem.querySelectorAll('*')[i]) {
+                        currentPage = currentPage + n;
+                        if (currentPage >= 1 && currentPage <= page.children.length) {
+                            showPage(currentPage);
+                        } else if (currentPage < 1) {
+                            currentPage = page.children.length;
+                            showPage(currentPage);
+                        } else {
+                            currentPage = 1;
+                            showPage(currentPage);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            sidecontrol[currentPage - 1].querySelectorAll('*').forEach(itemAll => {
+                if (event.target == sidecontrol[currentPage - 1] || event.target == itemAll) {
+                    const icon = sidecontrol[currentPage - 1].querySelectorAll('a')[0];
+                    icon.querySelectorAll('*').forEach(item => {
+                        if (event.target == icon || event.target == item) {
+                            event.preventDefault();
+                            let link = document.createElement('a');
+                            link.setAttribute('href', 'index.html');
+                            link.click();
+                            link.remove();
+                        }
+                    });
+
+                    const arrow = sidecontrol[currentPage - 1].querySelectorAll('a')[1];
+                    movePage(arrow, 1);
+                }
+            });
+
+            if (moduleControl) {
+                movePage(moduleControl[currentPage - 1].querySelector('.prev'), -1);
+                movePage(moduleControl[currentPage - 1].querySelector('.next'), 1);
+                setNum(currentPage);
+            };
+        });
+    }
+
+    if (page) {
+        loadContent(page, 1);
+        // переход по плюсику на слайдере первого экрана
+        document.body.addEventListener('click', event => {
+            plus.querySelectorAll('*').forEach(item => {
+                if (event.target == item || event.target == plus) {
+                    let link = document.createElement('a');
+                    link.setAttribute('href', 'modules.html');
+                    link.click();
+                    link.remove();
+                }
+            })
+        });
+        // переход по слайдам на слайдере первого экрана
+        slider.addEventListener('click', (event) => {
+            slider.querySelectorAll('.showup__content-slider .card').forEach((itemCard,indexCard) => {
+                for (let i = 0; i < itemCard.querySelectorAll('*').length; i++) {
+                    if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
+                        let pageLink = indexCard + 1;
+                        console.log('+');
+                        let link = document.createElement('a');
+                        link.setAttribute('href', `modules.html#${pageLink}`);
+                        link.click();
+                        link.remove();
+                        break;
+                    }
+                }
+            })
+        });
+    } else if (moduleapp) {
+        loadContent(moduleapp, currentPage);
+        setNum(currentPage);
+    }
 }
 
 module.exports = navigation;

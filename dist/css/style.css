@@ -13,6 +13,12 @@
   height: 100vh;
   overflow: hidden; }
 
+.hidePage {
+  display: none; }
+
+.activePage {
+  display: block; }
+
 a {
   color: inherit;
   text-decoration: none; }
@@ -376,6 +382,14 @@ a {
         margin-right: 24px;
         cursor: pointer;
         box-shadow: 0 0px 20px rgba(0, 0, 0, 0.5); }
+        .showup__content-slider .card:hover {
+          padding-top: 32px; }
+          .showup__content-slider .card:hover .card__controls-arrow {
+            opacity: 1; }
+          .showup__content-slider .card:hover .card__title {
+            opacity: 1; }
+          .showup__content-slider .card:hover .card__description {
+            opacity: .5; }
         .showup__content-slider .card__controls {
           width: 100%;
           display: flex;
