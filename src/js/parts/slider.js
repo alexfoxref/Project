@@ -127,6 +127,9 @@ let slider = (slider, card, control, width, active) => {
             }
         });
     }
+    if (card == 'modules__content-slider .card') {
+        setInterval(() => {moveSlide(-1)}, 4000);
+    }
 }
 
 module.exports = slider;

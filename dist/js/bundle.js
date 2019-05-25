@@ -460,6 +460,12 @@ var slider = function slider(_slider, card, control, width, active) {
       }
     });
   }
+
+  if (card == 'modules__content-slider .card') {
+    setInterval(function () {
+      moveSlide(-1);
+    }, 4000);
+  }
 };
 
 module.exports = slider;
