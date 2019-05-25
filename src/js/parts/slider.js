@@ -1,9 +1,7 @@
-let slider = () => {
+let slider = (slider, card, control, width, active) => {
     
-    const slides = document.querySelectorAll('.showup__content-slider .card'),
-        slider = document.querySelector('.showup__content-slider'),
-        width = slider.querySelector('.card:nth-child(2)').getBoundingClientRect().left - 
-                slider.querySelector('.card:nth-child(1)').getBoundingClientRect().left;
+    const sliderWin = document.querySelector(`.${slider}`),
+        controlWin = document.querySelector(`.${control}`);
 
     //функция для делегирования события на элемент со всеми его потомками
     let clickElem = (elem, func) => {
@@ -14,69 +12,118 @@ let slider = () => {
             }
         }
     }
+    let moveLength = 0;
+    if (card == 'feed__item') {
+        moveLength = parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[0]).width) + 
+            parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[0]).marginRight);
+    }
     // перемещение слайдов
     let moveSlide = (n) => {
         // запретим по классу onmove нажатие на контрольные кнопки и на ссылку первого слайда
-        document.querySelector('.showup__content-btns').classList.add('onmove');
+        controlWin.classList.add('onmove');
+        let countBtn,
+            countHide,
+            countIn = 0;
         if (n > 0) {
-            // при нажатии на next последний элемент добавляем в начало и причесываем классы
-            slider.insertBefore(slider.querySelector('.card:last-child'), slider.querySelector('.card:first-child'));
-            slider.querySelector('.card:first-child').style.marginLeft = `-${width}px`;
-            slider.querySelector('.card:first-child').style.opacity = '0';
-            slider.querySelector('.card:first-child').classList.add('onmove');
-            slider.querySelector('.card:first-child').classList.add('card-active');
-            slider.querySelector('.card:nth-child(2)').classList.remove('card-active');
-            // анимация для next
-            let countNext = +`-${width}`,
-                countFade = 0;
+            // при нажатии на prev последний элемент добавляем в начало и причесываем классы
+            sliderWin.insertBefore(sliderWin.querySelector(`.${card}:last-child`), sliderWin.querySelector(`.${card}:first-child`));
+            if (card == 'feed__item') {
+                sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `${width}px`;
+                sliderWin.querySelector(`.${card}:first-child`).style.position = 'absolute';
+                sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `0`;
+            } else {
+                sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `-${width}px`;
+            }
+            sliderWin.querySelector(`.${card}:first-child`).classList.add(active);
+            sliderWin.querySelector(`.${card}:nth-child(2)`).classList.remove(active);
+            sliderWin.querySelector(`.${card}:first-child`).style.opacity = '0';
+            sliderWin.querySelector(`.${card}:first-child`).classList.add('onmove');
+            // анимация для prev
+            countHide = 0;
+            if (card == 'feed__item') {
+                countIn = 0;
+                countBtn = +`${width}`;
+            } else {
+                countBtn = +`-${width}`;
+            }
 
-            let frameNext = () => {
-                slider.querySelector('.card:first-child').style.marginLeft = `${countNext += parseFloat((width/50)*n)}px`;
-                slider.querySelector('.card:first-child').style.opacity = `${countFade += parseFloat((1/50)*n)}`;
-                if (countNext >= 0) {
-                    slider.querySelector('.card:first-child').style.marginLeft = '0';
-                    clearInterval(moveNextAnimation);
-                    slider.querySelector('.card:first-child').classList.remove('onmove');
-                    document.querySelector('.showup__content-btns').classList.remove('onmove');
+            let framePrev = () => {
+                if (card == 'feed__item') {
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `${countBtn -= parseFloat((width/50)*n)}px`;
+                    sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `${countIn += parseFloat((moveLength/50)*n)}px`;
+                } else {
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `${countBtn += parseFloat((width/50)*n)}px`;
+                }
+                sliderWin.querySelector(`.${card}:first-child`).style.opacity = `${countHide += parseFloat((1/50)*n)}`;
+                if ((card != 'feed__item' && countBtn >= 0) ||
+                        (card == 'feed__item' && countIn >= moveLength)) {
+                    if (card == 'feed__item') {
+                        sliderWin.querySelector(`.${card}:first-child`).style.position = '';
+                        sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `0`;
+
+                    }
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = '0';
+                    clearInterval(movePrevAnimation);
+                    sliderWin.querySelector(`.${card}:first-child`).classList.remove('onmove');
+                    controlWin.classList.remove('onmove');
                 }
             }
-            let moveNextAnimation = setInterval(frameNext, 10);
+            let movePrevAnimation = setInterval(framePrev, 10);
 
         } else if (n < 0) {
-            // при нажатии на prev сначала делаем анимацию, а затем перемещение первого слайда в конец
-            slider.querySelector('.card:first-child').style.marginLeft = `0`;
-            slider.querySelector('.card:first-child').style.opacity = '1';
-            slider.querySelector('.card:first-child').classList.add('onmove');
-            slider.querySelector('.card:first-child').classList.remove('card-active');
-            slider.querySelector('.card:nth-child(2)').classList.add('card-active');
-            // анимация для prev
-            let countPrev = 0,
-                countHide = 1;
-            let framePrev = () => {
-                slider.querySelector('.card:first-child').style.marginLeft = `${countPrev += parseFloat((width/50)*n)}px`;
-                slider.querySelector('.card:first-child').style.opacity = `${countHide += parseFloat((1/50)*n)}`;
-                if (countPrev <= -width) {
-                    clearInterval(movePrevAnimation);
-                    slider.querySelector('.card:first-child').classList.remove('onmove');
-                    slider.querySelector('.card:first-child').style.marginLeft = `0`;
-                    slider.querySelector('.card:first-child').style.opacity = '1';
-                    slider.appendChild(slider.querySelector('.card:first-child'));
-                    document.querySelector('.showup__content-btns').classList.remove('onmove');
+            // при нажатии на next сначала делаем анимацию, а затем перемещение первого слайда в конец
+            sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `0`;
+            sliderWin.querySelector(`.${card}:first-child`).style.opacity = '1';
+            sliderWin.querySelector(`.${card}:first-child`).classList.add('onmove');
+            sliderWin.querySelector(`.${card}:first-child`).classList.remove(active);
+            sliderWin.querySelector(`.${card}:nth-child(2)`).classList.add(active);
+            if (card == 'feed__item') {
+                sliderWin.querySelector(`.${card}:first-child`).style.position = 'absolute';
+                sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = moveLength;
+                console.log('+');
+            }
+            // анимация для next
+            countBtn = 0;
+            countHide = 1;
+            if (card == 'feed__item') {
+                countIn = moveLength;
+            }
+            let frameNext = () => {
+                if (card == 'feed__item') {
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `${countBtn -= parseFloat((width/50)*n)}px`;
+                    sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `${countIn += parseFloat((moveLength/50)*n)}px`;
+                } else {
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `${countBtn += parseFloat((width/50)*n)}px`;
+                }
+                sliderWin.querySelector(`.${card}:first-child`).style.opacity = `${countHide += parseFloat((1/50)*n)}`;
+                if ((card != 'feed__item' && countBtn <= -width) ||
+                        (card == 'feed__item' && countIn <= 0)) {
+                    clearInterval(moveNextAnimation);
+                    sliderWin.querySelector(`.${card}:first-child`).classList.remove('onmove');
+                    sliderWin.querySelector(`.${card}:first-child`).style.marginLeft = `0`;
+                    sliderWin.querySelector(`.${card}:first-child`).style.opacity = '1';
+                    if (card == 'feed__item') {
+                        sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `0`;
+                        sliderWin.querySelector(`.${card}:first-child`).style.position = '';
+                        console.log('-');
+                    }
+                    sliderWin.appendChild(sliderWin.querySelector(`.${card}:first-child`));
+                    controlWin.classList.remove('onmove');
                 }
             }
 
-            let movePrevAnimation = setInterval(framePrev, 10);
+            let moveNextAnimation = setInterval(frameNext, 10);
         }
     }
     //если слайды есть и на кнопках не висит onmove, то по клику на кнопки перемещаем слайды
-    if (slides.length > 0) {
-        document.querySelector('.showup__content-btns').addEventListener('click', event => {
-            if (!document.querySelector('.showup__content-btns').classList.contains('onmove')) {
-                clickElem(document.querySelector('.showup__content-btns .slick-prev'), () => {
-                    moveSlide(-1);
-                });
-                clickElem(document.querySelector('.showup__content-btns .slick-next'), () => {
+    if (document.querySelectorAll(`.${card}`).length > 0) {
+        controlWin.addEventListener('click', event => {
+            if (!controlWin.classList.contains('onmove')) {
+                clickElem(controlWin.querySelector('.slick-prev'), () => {
                     moveSlide(1);
+                });
+                clickElem(controlWin.querySelector('.slick-next'), () => {
+                    moveSlide(-1);
                 });
             }
         });

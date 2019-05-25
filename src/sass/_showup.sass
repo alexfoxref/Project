@@ -65,12 +65,13 @@
                 position: relative
                 width: 43px
                 height: 43px
-                border: 2px solid #EAEAEA
+                border: 2px solid #a0a0a0
                 border-radius: 100%
                 background-color: transparent
                 cursor: pointer
                 margin-right: 12px
                 svg
+                    fill: #a0a0a0
                     position: absolute
                     width: 12px
                     height: 12px
@@ -86,11 +87,12 @@
                 position: relative
                 width: 43px
                 height: 43px
-                border: 2px solid #EAEAEA
+                border: 2px solid #a0a0a0
                 border-radius: 100%
                 background-color: transparent
                 cursor: pointer
                 svg
+                    fill: #a0a0a0
                     position: absolute
                     width: 12px
                     height: 12px
@@ -159,6 +161,17 @@
                 margin-right: 24px
                 cursor: pointer
                 box-shadow: 0 0px 20px rgba(0,0,0,.5)
+                &-active
+                    padding-top: 32px
+                    // transition: .5s all
+                    .card
+                        &__controls
+                            &-arrow
+                                opacity: 1
+                        &__title
+                            opacity: 1
+                        &__description
+                            opacity: 1
                 // &:hover
                 //     padding-top: 32px
                 //     .card

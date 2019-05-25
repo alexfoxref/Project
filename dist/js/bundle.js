@@ -312,10 +312,9 @@ module.exports = navigation;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var slider = function slider() {
-  var slides = document.querySelectorAll('.showup__content-slider .card'),
-      slider = document.querySelector('.showup__content-slider'),
-      width = slider.querySelector('.card:nth-child(2)').getBoundingClientRect().left - slider.querySelector('.card:nth-child(1)').getBoundingClientRect().left; //функция для делегирования события на элемент со всеми его потомками
+var slider = function slider(_slider, card, control, width, active) {
+  var sliderWin = document.querySelector(".".concat(_slider)),
+      controlWin = document.querySelector(".".concat(control)); //функция для делегирования события на элемент со всеми его потомками
 
   var clickElem = function clickElem(elem, func) {
     for (var i = 0; i < elem.querySelectorAll('*').length; i++) {
@@ -324,76 +323,134 @@ var slider = function slider() {
         break;
       }
     }
-  }; // перемещение слайдов
+  };
+
+  var moveLength = 0;
+
+  if (card == 'feed__item') {
+    moveLength = parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[0]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[0]).marginRight);
+  } // перемещение слайдов
 
 
   var moveSlide = function moveSlide(n) {
     // запретим по классу onmove нажатие на контрольные кнопки и на ссылку первого слайда
-    document.querySelector('.showup__content-btns').classList.add('onmove');
+    controlWin.classList.add('onmove');
+    var countBtn,
+        countHide,
+        countIn = 0;
 
     if (n > 0) {
-      // при нажатии на next последний элемент добавляем в начало и причесываем классы
-      slider.insertBefore(slider.querySelector('.card:last-child'), slider.querySelector('.card:first-child'));
-      slider.querySelector('.card:first-child').style.marginLeft = "-".concat(width, "px");
-      slider.querySelector('.card:first-child').style.opacity = '0';
-      slider.querySelector('.card:first-child').classList.add('onmove');
-      slider.querySelector('.card:first-child').classList.add('card-active');
-      slider.querySelector('.card:nth-child(2)').classList.remove('card-active'); // анимация для next
+      // при нажатии на prev последний элемент добавляем в начало и причесываем классы
+      sliderWin.insertBefore(sliderWin.querySelector(".".concat(card, ":last-child")), sliderWin.querySelector(".".concat(card, ":first-child")));
 
-      var countNext = +"-".concat(width),
-          countFade = 0;
+      if (card == 'feed__item') {
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "".concat(width, "px");
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.position = 'absolute';
+        sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "0";
+      } else {
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "-".concat(width, "px");
+      }
 
-      var frameNext = function frameNext() {
-        slider.querySelector('.card:first-child').style.marginLeft = "".concat(countNext += parseFloat(width / 50 * n), "px");
-        slider.querySelector('.card:first-child').style.opacity = "".concat(countFade += parseFloat(1 / 50 * n));
+      sliderWin.querySelector(".".concat(card, ":first-child")).classList.add(active);
+      sliderWin.querySelector(".".concat(card, ":nth-child(2)")).classList.remove(active);
+      sliderWin.querySelector(".".concat(card, ":first-child")).style.opacity = '0';
+      sliderWin.querySelector(".".concat(card, ":first-child")).classList.add('onmove'); // анимация для prev
 
-        if (countNext >= 0) {
-          slider.querySelector('.card:first-child').style.marginLeft = '0';
-          clearInterval(moveNextAnimation);
-          slider.querySelector('.card:first-child').classList.remove('onmove');
-          document.querySelector('.showup__content-btns').classList.remove('onmove');
-        }
-      };
+      countHide = 0;
 
-      var moveNextAnimation = setInterval(frameNext, 10);
-    } else if (n < 0) {
-      // при нажатии на prev сначала делаем анимацию, а затем перемещение первого слайда в конец
-      slider.querySelector('.card:first-child').style.marginLeft = "0";
-      slider.querySelector('.card:first-child').style.opacity = '1';
-      slider.querySelector('.card:first-child').classList.add('onmove');
-      slider.querySelector('.card:first-child').classList.remove('card-active');
-      slider.querySelector('.card:nth-child(2)').classList.add('card-active'); // анимация для prev
-
-      var countPrev = 0,
-          countHide = 1;
+      if (card == 'feed__item') {
+        countIn = 0;
+        countBtn = +"".concat(width);
+      } else {
+        countBtn = +"-".concat(width);
+      }
 
       var framePrev = function framePrev() {
-        slider.querySelector('.card:first-child').style.marginLeft = "".concat(countPrev += parseFloat(width / 50 * n), "px");
-        slider.querySelector('.card:first-child').style.opacity = "".concat(countHide += parseFloat(1 / 50 * n));
+        if (card == 'feed__item') {
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "".concat(countBtn -= parseFloat(width / 50 * n), "px");
+          sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "".concat(countIn += parseFloat(moveLength / 50 * n), "px");
+        } else {
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "".concat(countBtn += parseFloat(width / 50 * n), "px");
+        }
 
-        if (countPrev <= -width) {
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.opacity = "".concat(countHide += parseFloat(1 / 50 * n));
+
+        if (card != 'feed__item' && countBtn >= 0 || card == 'feed__item' && countIn >= moveLength) {
+          if (card == 'feed__item') {
+            sliderWin.querySelector(".".concat(card, ":first-child")).style.position = '';
+            sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "0";
+          }
+
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = '0';
           clearInterval(movePrevAnimation);
-          slider.querySelector('.card:first-child').classList.remove('onmove');
-          slider.querySelector('.card:first-child').style.marginLeft = "0";
-          slider.querySelector('.card:first-child').style.opacity = '1';
-          slider.appendChild(slider.querySelector('.card:first-child'));
-          document.querySelector('.showup__content-btns').classList.remove('onmove');
+          sliderWin.querySelector(".".concat(card, ":first-child")).classList.remove('onmove');
+          controlWin.classList.remove('onmove');
         }
       };
 
       var movePrevAnimation = setInterval(framePrev, 10);
+    } else if (n < 0) {
+      // при нажатии на next сначала делаем анимацию, а затем перемещение первого слайда в конец
+      sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "0";
+      sliderWin.querySelector(".".concat(card, ":first-child")).style.opacity = '1';
+      sliderWin.querySelector(".".concat(card, ":first-child")).classList.add('onmove');
+      sliderWin.querySelector(".".concat(card, ":first-child")).classList.remove(active);
+      sliderWin.querySelector(".".concat(card, ":nth-child(2)")).classList.add(active);
+
+      if (card == 'feed__item') {
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.position = 'absolute';
+        sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = moveLength;
+        console.log('+');
+      } // анимация для next
+
+
+      countBtn = 0;
+      countHide = 1;
+
+      if (card == 'feed__item') {
+        countIn = moveLength;
+      }
+
+      var frameNext = function frameNext() {
+        if (card == 'feed__item') {
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "".concat(countBtn -= parseFloat(width / 50 * n), "px");
+          sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "".concat(countIn += parseFloat(moveLength / 50 * n), "px");
+        } else {
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "".concat(countBtn += parseFloat(width / 50 * n), "px");
+        }
+
+        sliderWin.querySelector(".".concat(card, ":first-child")).style.opacity = "".concat(countHide += parseFloat(1 / 50 * n));
+
+        if (card != 'feed__item' && countBtn <= -width || card == 'feed__item' && countIn <= 0) {
+          clearInterval(moveNextAnimation);
+          sliderWin.querySelector(".".concat(card, ":first-child")).classList.remove('onmove');
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.marginLeft = "0";
+          sliderWin.querySelector(".".concat(card, ":first-child")).style.opacity = '1';
+
+          if (card == 'feed__item') {
+            sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "0";
+            sliderWin.querySelector(".".concat(card, ":first-child")).style.position = '';
+            console.log('-');
+          }
+
+          sliderWin.appendChild(sliderWin.querySelector(".".concat(card, ":first-child")));
+          controlWin.classList.remove('onmove');
+        }
+      };
+
+      var moveNextAnimation = setInterval(frameNext, 10);
     }
   }; //если слайды есть и на кнопках не висит onmove, то по клику на кнопки перемещаем слайды
 
 
-  if (slides.length > 0) {
-    document.querySelector('.showup__content-btns').addEventListener('click', function (event) {
-      if (!document.querySelector('.showup__content-btns').classList.contains('onmove')) {
-        clickElem(document.querySelector('.showup__content-btns .slick-prev'), function () {
-          moveSlide(-1);
-        });
-        clickElem(document.querySelector('.showup__content-btns .slick-next'), function () {
+  if (document.querySelectorAll(".".concat(card)).length > 0) {
+    controlWin.addEventListener('click', function (event) {
+      if (!controlWin.classList.contains('onmove')) {
+        clickElem(controlWin.querySelector('.slick-prev'), function () {
           moveSlide(1);
+        });
+        clickElem(controlWin.querySelector('.slick-next'), function () {
+          moveSlide(-1);
         });
       }
     });
@@ -419,7 +476,8 @@ window.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
-      slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js");
+      slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"); //к навигации
+
 
   var currentPage;
 
@@ -427,10 +485,24 @@ window.addEventListener('DOMContentLoaded', function () {
     currentPage = +window.location.href.slice(-1);
   } else {
     currentPage = 1;
-  }
+  } //к слайдерам
+
+
+  var widthShowup = 0,
+      widthModules = 0,
+      widthFeed = 0;
+
+  if (document.querySelector(".showup__content-slider") && document.querySelector(".modules__content-slider")) {
+    widthShowup = parseFloat(getComputedStyle(document.querySelectorAll(".showup__content-slider .card")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".showup__content-slider .card")[1]).marginRight);
+    widthModules = parseFloat(getComputedStyle(document.querySelectorAll(".modules__content-slider .card")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".modules__content-slider .card")[1]).marginRight);
+    widthFeed = parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[1]).marginRight);
+  } //подключение
+
 
   navigation(currentPage);
-  slider();
+  slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
+  slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
+  slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
 });
 
 /***/ })
