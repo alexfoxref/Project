@@ -59,9 +59,14 @@ let navigation = (currentPage, teach) => {
                             currentPage = 1;
                             showPage(currentPage);
                         }
-                        // активация всплытия окна учителя на 3 странице
-                        if (pageStr == page && currentPage == 3) {
-                            teach();                            
+                        // активация всплытия окна учителя и автослайдера на 3 странице
+                        if (pageStr == page) {
+                            if (currentPage == 3) {
+                                teach();
+                                document.querySelector('.modules__content-slider').classList.add('auto');
+                            } else {
+                                document.querySelector('.modules__content-slider').classList.remove('auto');
+                            }
                         } 
                         break;
                     }

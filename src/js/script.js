@@ -29,6 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
         widthFeed = parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).width) + 
             parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).marginRight);
     }
+   
     //подключение
     navigation(currentPage, teach);
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');

@@ -231,11 +231,16 @@ var navigation = function navigation(currentPage, teach) {
             } else {
               currentPage = 1;
               showPage(currentPage);
-            } // активация всплытия окна учителя на 3 странице
+            } // активация всплытия окна учителя и автослайдера на 3 странице
 
 
-            if (pageStr == page && currentPage == 3) {
-              teach();
+            if (pageStr == page) {
+              if (currentPage == 3) {
+                teach();
+                document.querySelector('.modules__content-slider').classList.add('auto');
+              } else {
+                document.querySelector('.modules__content-slider').classList.remove('auto');
+              }
             }
 
             break;
@@ -462,8 +467,10 @@ var slider = function slider(_slider, card, control, width, active) {
   }
 
   if (card == 'modules__content-slider .card') {
-    setInterval(function () {
-      moveSlide(-1);
+    var autoSlider = setInterval(function () {
+      if (sliderWin.classList.contains('auto') && !controlWin.classList.contains('onmove')) {
+        moveSlide(-1);
+      }
     }, 4000);
   }
 };
