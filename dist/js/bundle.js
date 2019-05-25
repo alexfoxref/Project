@@ -166,6 +166,38 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/js/parts/download.js":
+/*!**********************************!*\
+  !*** ./src/js/parts/download.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var download = function download() {
+  downloadBtns = document.querySelectorAll('.download');
+
+  if (downloadBtns.length != 0) {
+    document.body.addEventListener('click', function (event) {
+      for (var i = 0; i < downloadBtns.length; i++) {
+        for (var j = 0; j < downloadBtns[i].querySelectorAll('*').length; j++) {
+          if (event.target == downloadBtns[i] || event.target == downloadBtns[i].querySelectorAll('*')[j]) {
+            var link = document.createElement('a');
+            link.setAttribute('href', './dist/download/ECMAScript.pdf');
+            link.setAttribute('download', '');
+            link.click();
+            link.remove();
+            break;
+          }
+        }
+      }
+    });
+  }
+};
+
+module.exports = download;
+
+/***/ }),
+
 /***/ "./src/js/parts/navigation.js":
 /*!************************************!*\
   !*** ./src/js/parts/navigation.js ***!
@@ -466,7 +498,7 @@ var slider = function slider(_slider, card, control, width, active) {
     });
   }
 
-  if (card == 'modules__content-slider .card') {
+  if (sliderWin && card == 'modules__content-slider .card') {
     var autoSlider = setInterval(function () {
       if (sliderWin.classList.contains('auto') && !controlWin.classList.contains('onmove')) {
         moveSlide(-1);
@@ -536,7 +568,8 @@ window.addEventListener('DOMContentLoaded', function () {
 
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
       slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"),
-      teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"); //к навигации
+      teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"),
+      download = __webpack_require__(/*! ./parts/download */ "./src/js/parts/download.js"); //к навигации
 
 
   var currentPage;
@@ -563,6 +596,7 @@ window.addEventListener('DOMContentLoaded', function () {
   slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
   slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
   slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
+  download();
 });
 
 /***/ })

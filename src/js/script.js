@@ -7,7 +7,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let navigation = require('./parts/navigation'),
         slider = require('./parts/slider'),
-        teach = require('./parts/teach');
+        teach = require('./parts/teach'),
+        download = require('./parts/download');
 
 
     //к навигации
@@ -35,5 +36,5 @@ window.addEventListener('DOMContentLoaded', () => {
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
     slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
     slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
-    
+    download();
 })

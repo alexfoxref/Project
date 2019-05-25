@@ -127,7 +127,7 @@ let slider = (slider, card, control, width, active) => {
             }
         });
     }
-    if (card == 'modules__content-slider .card') {
+    if (sliderWin && card == 'modules__content-slider .card') {
         let autoSlider = setInterval(() => {
             if (sliderWin.classList.contains('auto') && !controlWin.classList.contains('onmove')) {
                 moveSlide(-1);
