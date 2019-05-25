@@ -654,7 +654,7 @@ a {
             fill: #6D53AF; }
     .modules__info .hanson {
       position: absolute;
-      bottom: 0;
+      bottom: -164px;
       width: 455px;
       height: 164px;
       background: url("../img/hanson.png") center center no-repeat;

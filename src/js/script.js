@@ -6,7 +6,10 @@ window.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     let navigation = require('./parts/navigation'),
-        slider = require('./parts/slider');
+        slider = require('./parts/slider'),
+        teach = require('./parts/teach');
+
+
     //к навигации
     let currentPage;
     if (window.location.href.match(/#\d/)) {
@@ -27,8 +30,9 @@ window.addEventListener('DOMContentLoaded', () => {
             parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).marginRight);
     }
     //подключение
-    navigation(currentPage);
+    navigation(currentPage, teach);
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
     slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
     slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
+    
 })

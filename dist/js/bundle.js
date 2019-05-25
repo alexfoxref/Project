@@ -173,7 +173,7 @@ module.exports = g;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var navigation = function navigation(currentPage) {
+var navigation = function navigation(currentPage, teach) {
   var page = document.querySelector('.page'),
       sidecontrol = document.querySelectorAll('.sidecontrol'),
       moduleapp = document.querySelector('.moduleapp'),
@@ -192,12 +192,13 @@ var navigation = function navigation(currentPage) {
       moduleControl[currentPage - 1].querySelector('.prev__counter').textContent = "0".concat(currentPage - 1);
       moduleControl[currentPage - 1].querySelector('.next__counter').textContent = "0".concat(currentPage + 1);
     }
-  };
+  }; //функция загрузки контента
 
-  var loadContent = function loadContent(page, currentPage) {
+
+  var loadContent = function loadContent(pageStr, currentPage) {
     //Показать нужную страницу
     var showPage = function showPage(n) {
-      var pageNames = document.querySelectorAll(".".concat(page.className, " > *")); // скрываем все страницы
+      var pageNames = document.querySelectorAll(".".concat(pageStr.className, " > *")); // скрываем все страницы
 
       pageNames.forEach(function (item) {
         item.classList.add('hidePage');
@@ -222,7 +223,7 @@ var navigation = function navigation(currentPage) {
           if (event.target == elem || event.target == elem.querySelectorAll('*')[i]) {
             currentPage = currentPage + n;
 
-            if (currentPage >= 1 && currentPage <= page.children.length) {
+            if (currentPage >= 1 && currentPage <= pageStr.children.length) {
               showPage(currentPage);
             } else if (currentPage < 1) {
               currentPage = page.children.length;
@@ -230,6 +231,11 @@ var navigation = function navigation(currentPage) {
             } else {
               currentPage = 1;
               showPage(currentPage);
+            } // активация всплытия окна учителя на 3 странице
+
+
+            if (pageStr == page && currentPage == 3) {
+              teach();
             }
 
             break;
@@ -312,6 +318,7 @@ module.exports = navigation;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+//можно ввести параметр стиль анимации, а не сравнивать параметр с классом, но пока так
 var slider = function slider(_slider, card, control, width, active) {
   var sliderWin = document.querySelector(".".concat(_slider)),
       controlWin = document.querySelector(".".concat(control)); //функция для делегирования события на элемент со всеми его потомками
@@ -327,7 +334,7 @@ var slider = function slider(_slider, card, control, width, active) {
 
   var moveLength = 0;
 
-  if (card == 'feed__item') {
+  if (sliderWin && card == 'feed__item') {
     moveLength = parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[0]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[0]).marginRight);
   } // перемещение слайдов
 
@@ -400,7 +407,6 @@ var slider = function slider(_slider, card, control, width, active) {
       if (card == 'feed__item') {
         sliderWin.querySelector(".".concat(card, ":first-child")).style.position = 'absolute';
         sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = moveLength;
-        console.log('+');
       } // анимация для next
 
 
@@ -430,7 +436,6 @@ var slider = function slider(_slider, card, control, width, active) {
           if (card == 'feed__item') {
             sliderWin.querySelector(".".concat(card, ":nth-child(2)")).style.marginLeft = "0";
             sliderWin.querySelector(".".concat(card, ":first-child")).style.position = '';
-            console.log('-');
           }
 
           sliderWin.appendChild(sliderWin.querySelector(".".concat(card, ":first-child")));
@@ -461,6 +466,47 @@ module.exports = slider;
 
 /***/ }),
 
+/***/ "./src/js/parts/teach.js":
+/*!*******************************!*\
+  !*** ./src/js/parts/teach.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var teach = function teach() {
+  var hanson = document.querySelector('.hanson');
+
+  var moveTeach = function moveTeach(ms) {
+    var listener = function listener() {
+      moveTeach(15000);
+    };
+
+    hanson.removeEventListener('click', listener);
+    hanson.style.bottom = "-".concat(hanson.offsetHeight, "px");
+    setTimeout(function () {
+      var position = -hanson.offsetHeight;
+
+      var moveFrame = function moveFrame() {
+        hanson.style.bottom = "".concat(position += hanson.offsetHeight / 50, "px");
+
+        if (position >= 0) {
+          hanson.style.bottom = '0';
+          clearInterval(moveBlock);
+        }
+      };
+
+      var moveBlock = setInterval(moveFrame, 10);
+    }, ms);
+    hanson.addEventListener('click', listener);
+  };
+
+  moveTeach(3000);
+};
+
+module.exports = teach;
+
+/***/ }),
+
 /***/ "./src/js/script.js":
 /*!**************************!*\
   !*** ./src/js/script.js ***!
@@ -476,7 +522,8 @@ window.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
-      slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"); //к навигации
+      slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"),
+      teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"); //к навигации
 
 
   var currentPage;
@@ -499,7 +546,7 @@ window.addEventListener('DOMContentLoaded', function () {
   } //подключение
 
 
-  navigation(currentPage);
+  navigation(currentPage, teach);
   slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
   slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
   slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');

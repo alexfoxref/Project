@@ -1,3 +1,4 @@
+//можно ввести параметр стиль анимации, а не сравнивать параметр с классом, но пока так
 let slider = (slider, card, control, width, active) => {
     
     const sliderWin = document.querySelector(`.${slider}`),
@@ -13,7 +14,7 @@ let slider = (slider, card, control, width, active) => {
         }
     }
     let moveLength = 0;
-    if (card == 'feed__item') {
+    if (sliderWin && card == 'feed__item') {
         moveLength = parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[0]).width) + 
             parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[0]).marginRight);
     }
@@ -80,7 +81,6 @@ let slider = (slider, card, control, width, active) => {
             if (card == 'feed__item') {
                 sliderWin.querySelector(`.${card}:first-child`).style.position = 'absolute';
                 sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = moveLength;
-                console.log('+');
             }
             // анимация для next
             countBtn = 0;
@@ -105,7 +105,6 @@ let slider = (slider, card, control, width, active) => {
                     if (card == 'feed__item') {
                         sliderWin.querySelector(`.${card}:nth-child(2)`).style.marginLeft = `0`;
                         sliderWin.querySelector(`.${card}:first-child`).style.position = '';
-                        console.log('-');
                     }
                     sliderWin.appendChild(sliderWin.querySelector(`.${card}:first-child`));
                     controlWin.classList.remove('onmove');

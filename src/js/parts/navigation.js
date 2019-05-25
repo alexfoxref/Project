@@ -1,4 +1,4 @@
-let navigation = (currentPage) => {
+let navigation = (currentPage, teach) => {
 
     const page = document.querySelector('.page'),
         sidecontrol = document.querySelectorAll('.sidecontrol'),
@@ -20,11 +20,11 @@ let navigation = (currentPage) => {
             moduleControl[currentPage - 1].querySelector('.next__counter').textContent = `0${currentPage + 1}`;
         }
     }
-
-    let loadContent = (page, currentPage) => {
+    //функция загрузки контента
+    let loadContent = (pageStr, currentPage) => {
         //Показать нужную страницу
         let showPage = (n) => {
-            let pageNames = document.querySelectorAll(`.${page.className} > *`);
+            let pageNames = document.querySelectorAll(`.${pageStr.className} > *`);
     
             // скрываем все страницы
             pageNames.forEach(item => {
@@ -50,7 +50,7 @@ let navigation = (currentPage) => {
                 for (let i = 0; i < elem.querySelectorAll('*').length; i++) {
                     if (event.target == elem || event.target == elem.querySelectorAll('*')[i]) {
                         currentPage = currentPage + n;
-                        if (currentPage >= 1 && currentPage <= page.children.length) {
+                        if (currentPage >= 1 && currentPage <= pageStr.children.length) {
                             showPage(currentPage);
                         } else if (currentPage < 1) {
                             currentPage = page.children.length;
@@ -59,6 +59,10 @@ let navigation = (currentPage) => {
                             currentPage = 1;
                             showPage(currentPage);
                         }
+                        // активация всплытия окна учителя на 3 странице
+                        if (pageStr == page && currentPage == 3) {
+                            teach();                            
+                        } 
                         break;
                     }
                 }
