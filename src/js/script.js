@@ -12,7 +12,8 @@ window.addEventListener('DOMContentLoaded', () => {
         download = require('./parts/download'),
         form = require('./parts/form'),
         phoneMask = require('./parts/phoneMask'),
-        accordion = require('./parts/accordion');
+        accordion = require('./parts/accordion'),
+        difference = require('./parts/difference');
 
 
     //к навигации
@@ -39,6 +40,9 @@ window.addEventListener('DOMContentLoaded', () => {
         formSchedule = document.querySelector('.schedule__form .form');
     //к телефонной маске
     const phone = document.getElementById('phone');
+    //к карточкам различий
+    const officerold = document.querySelector('.officerold'),
+        officernew = document.querySelector('.officernew');
     //подключение
     navigation(currentPage, teach);
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
@@ -49,4 +53,6 @@ window.addEventListener('DOMContentLoaded', () => {
     form(formSchedule);
     phoneMask(phone, 1);
     accordion();
+    difference(officerold);
+    difference(officernew);
 })
