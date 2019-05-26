@@ -8,7 +8,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let navigation = require('./parts/navigation'),
         slider = require('./parts/slider'),
         teach = require('./parts/teach'),
-        download = require('./parts/download');
+        download = require('./parts/download'),
+        form = require('./parts/form');
 
 
     //к навигации
@@ -30,11 +31,15 @@ window.addEventListener('DOMContentLoaded', () => {
         widthFeed = parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).width) + 
             parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).marginRight);
     }
-   
+    //к формам
+    let formJoin = document.querySelector('.join__evolution .form'),
+        formSchedule = document.querySelector('.schedule__form .form');
     //подключение
     navigation(currentPage, teach);
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
     slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
     slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
     download();
+    form(formJoin);
+    form(formSchedule);
 })

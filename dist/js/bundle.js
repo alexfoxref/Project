@@ -198,6 +198,50 @@ module.exports = download;
 
 /***/ }),
 
+/***/ "./src/js/parts/form.js":
+/*!******************************!*\
+  !*** ./src/js/parts/form.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var form = function form(formBlock) {
+  if (formBlock) {
+    var formBtn = formBlock.querySelector('.btn');
+
+    var sendForm = function sendForm(formBlock) {
+      formBlock.addEventListener('submit', function (event) {
+        event.preventDefault(); //создаем данные в формате json
+
+        var formData = new FormData(formBlock),
+            obj = {};
+        formData.forEach(function (value, key) {
+          obj[key] = value;
+        });
+        var json = JSON.stringify(obj); //отправляем форму
+
+        fetch('server.php', {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: json
+        }).then(function (response) {
+          if (response.status == 200) {} else {}
+        }).catch(function () {
+          console.error('Неуспех');
+        });
+      });
+    };
+
+    sendForm(formBlock);
+  }
+};
+
+module.exports = form;
+
+/***/ }),
+
 /***/ "./src/js/parts/navigation.js":
 /*!************************************!*\
   !*** ./src/js/parts/navigation.js ***!
@@ -258,7 +302,7 @@ var navigation = function navigation(currentPage, teach) {
             if (currentPage >= 1 && currentPage <= pageStr.children.length) {
               showPage(currentPage);
             } else if (currentPage < 1) {
-              currentPage = page.children.length;
+              currentPage = pageStr.children.length;
               showPage(currentPage);
             } else {
               currentPage = 1;
@@ -569,7 +613,8 @@ window.addEventListener('DOMContentLoaded', function () {
   var navigation = __webpack_require__(/*! ./parts/navigation */ "./src/js/parts/navigation.js"),
       slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"),
       teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"),
-      download = __webpack_require__(/*! ./parts/download */ "./src/js/parts/download.js"); //к навигации
+      download = __webpack_require__(/*! ./parts/download */ "./src/js/parts/download.js"),
+      form = __webpack_require__(/*! ./parts/form */ "./src/js/parts/form.js"); //к навигации
 
 
   var currentPage;
@@ -589,14 +634,19 @@ window.addEventListener('DOMContentLoaded', function () {
     widthShowup = parseFloat(getComputedStyle(document.querySelectorAll(".showup__content-slider .card")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".showup__content-slider .card")[1]).marginRight);
     widthModules = parseFloat(getComputedStyle(document.querySelectorAll(".modules__content-slider .card")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".modules__content-slider .card")[1]).marginRight);
     widthFeed = parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[1]).width) + parseFloat(getComputedStyle(document.querySelectorAll(".feed__slider .feed__item")[1]).marginRight);
-  } //подключение
+  } //к формам
 
+
+  var formJoin = document.querySelector('.join__evolution .form'),
+      formSchedule = document.querySelector('.schedule__form .form'); //подключение
 
   navigation(currentPage, teach);
   slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
   slider('modules__content-slider', 'modules__content-slider .card', 'modules__info-btns', widthModules, 'card-active');
   slider('feed__slider', 'feed__item', 'feed__btns', widthFeed, 'feed__item-active');
   download();
+  form(formJoin);
+  form(formSchedule);
 });
 
 /***/ })

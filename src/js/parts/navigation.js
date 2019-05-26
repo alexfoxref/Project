@@ -53,7 +53,7 @@ let navigation = (currentPage, teach) => {
                         if (currentPage >= 1 && currentPage <= pageStr.children.length) {
                             showPage(currentPage);
                         } else if (currentPage < 1) {
-                            currentPage = page.children.length;
+                            currentPage = pageStr.children.length;
                             showPage(currentPage);
                         } else {
                             currentPage = 1;
