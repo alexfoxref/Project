@@ -27,7 +27,7 @@ let accordion = () => {
                             descr.style.overflow = 'hidden';
                             let countHeight = 0;
                             let frame = () => {
-                                descr.style.height = `${countHeight += height/50}px`;
+                                descr.style.height = `${countHeight += height/30}px`;
                                 if (countHeight >= height) {
                                     descr.style.height = `${height}px`;
                                     clearInterval(accordIn);
@@ -39,7 +39,7 @@ let accordion = () => {
                                 height = descr.getBoundingClientRect().height;
                             let countHeight = height;
                             let frame = () => {
-                                descr.style.height = `${countHeight -= height/50}px`;
+                                descr.style.height = `${countHeight -= height/30}px`;
                                 if (countHeight <= 0) {
                                     descr.style.height = `0`;
                                     clearInterval(accordOut);

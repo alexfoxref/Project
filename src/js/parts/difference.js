@@ -7,7 +7,9 @@ let difference = column => {
         //функция создания новых карточек
         const cardNames = ['First', 'Second', 'Third'];
         let createCard = n => {
-            let card = document.createElement('div');
+            let card = document.createElement('div'),
+                margin,
+                moveLength;
             card.classList.add('officer__card-item');
             if (n == 1) {
                 card.innerHTML = `
@@ -43,17 +45,61 @@ let difference = column => {
                 `;
                 column.appendChild(card);
             } else if (n > 1 && n <= 4) {
-                card.innerHTML = `
-                    <div class="card__counter">0${n-1}</div>
-                    <div class="card__descr">
-                        ${cardNames[n-2]} step with some text
-                        and explanation
-                    </div>
-                `;
-                column.insertBefore(card, column.lastChild);
-                if (n == 4) {
-                    column.removeChild(column.lastChild);
+                //функция добавления карточек с анимацией
+                let cardMove = n => {
+                    moveLength = column.children[1].getBoundingClientRect().height;
+                    margin = column.children[1].getBoundingClientRect().top - column.children[0].getBoundingClientRect().bottom;
+                    let position = margin;
+                    let lastCardOpacity = 1;
+                    // console.log(margin, moveLength);
+                    let firstFrame = () => {
+                        column.lastChild.style.marginTop = `${position += (margin + moveLength)/30}px`;
+                        if (n == 4) {column.lastChild.style.opacity = `${lastCardOpacity -= 1/30}`};
+                        if (position >= (margin + (margin + moveLength)/2)) {
+                            clearInterval(firstMove);
+                            column.lastChild.style.marginTop = `${margin + (margin + moveLength)/2}px`;
+                            if (n == 4) {column.lastChild.style.opacity = `0.5`};
+                            card.innerHTML = `
+                                <div class="card__counter">0${n-1}</div>
+                                <div class="card__descr">
+                                    ${cardNames[n-2]} step with some text
+                                    and explanation
+                                </div>
+                            `;
+                            column.insertBefore(card, column.lastChild);
+                            card.style.position = 'absolute';
+                            card.style.marginTop = `${margin - (margin + moveLength)}px`;
+                            card.style.opacity = '0';
+                            if (n == 4) {
+                                column.lastChild.style.position = 'absolute';
+                                lastCardOpacity = 0.5;
+                            }
+                            position = margin + (margin + moveLength)/2;
+                            let cardPosition = margin - (margin + moveLength),
+                                cardOpacity = 0;
+                            let secondFrame = () => {
+                                card.style.marginTop = `${cardPosition += (margin + moveLength)/15}px`;
+                                card.style.opacity = `${cardOpacity += 1/15}`;
+                                column.lastChild.style.marginTop = `${position += (margin + moveLength)/30}px`;
+                                if (n == 4) {column.lastChild.style.opacity = `${lastCardOpacity -= 1/30}`;}
+                                if (position >= (2*margin + moveLength)) {
+                                    clearInterval(secondMove);
+                                    column.lastChild.style.marginTop = `${margin}px`;
+                                    card.style.marginTop = `${margin}px`;
+                                    card.style.opacity = '1';
+                                    card.style.position = '';
+                                    if (n == 4) {
+                                        column.lastChild.style.opacity = `0`;
+                                        column.removeChild(column.lastChild);
+                                    }
+                                }
+                            }
+                            let secondMove = setInterval(secondFrame, 10);
+                        }
+                    }
+                    let firstMove = setInterval(firstFrame, 10);
                 }
+                cardMove(n);
             }
         }
 
