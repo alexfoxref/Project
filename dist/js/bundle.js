@@ -542,60 +542,71 @@ module.exports = g;
 /***/ (function(module, exports) {
 
 var accordion = function accordion() {
-  var btn = document.querySelector('.module__info-show .plus__content');
+  var btn = document.querySelectorAll('.module__info-show .plus__content');
 
-  if (btn) {
-    var count = 0;
+  if (btn.length != 0) {
+    var count = [];
+
+    for (var i = 0; i < btn.length; i++) {
+      count[i] = 0;
+    }
+
     document.body.addEventListener('click', function (event) {
-      for (var i = 0; i < btn.querySelectorAll('*').length; i++) {
-        if (event.target == btn || event.target == btn.querySelectorAll('*')[i]) {
-          count++;
+      var _loop = function _loop(j) {
+        for (var _i = 0; _i < btn[j].querySelectorAll('*').length; _i++) {
+          if (event.target == btn[j] || event.target == btn[j].querySelectorAll('*')[_i]) {
+            count[j]++;
 
-          if (count % 2 != 0) {
-            (function () {
-              var descr = document.createElement('div');
-              descr.classList.add('module__info-descr');
-              document.querySelector('.module__info').insertBefore(descr, document.querySelector('.module__info-show ~ hr'));
-              descr.textContent = "This module focuses on how to leverage your local muscle and \n                                generate leads in your local community. Topics include areas to develop \n                                like: your local gym, church, favorite local restaurant or bar, etc.. \n                                Along with local business networking groups, community involvement and \n                                charity work, local businesses (lender express and lender advantage), local \n                                lunch n learns, first time homebuyer education, VA and or Reno events, and \n                                more."; //анимация появления
+            if (count[j] % 2 != 0) {
+              (function () {
+                var descr = document.createElement('div');
+                descr.classList.add('module__info-descr');
+                document.querySelectorAll('.module__info')[j].insertBefore(descr, document.querySelectorAll('.module__info-show ~ hr')[j]);
+                descr.textContent = "This module focuses on how to leverage your local muscle and \n                                    generate leads in your local community. Topics include areas to develop \n                                    like: your local gym, church, favorite local restaurant or bar, etc.. \n                                    Along with local business networking groups, community involvement and \n                                    charity work, local businesses (lender express and lender advantage), local \n                                    lunch n learns, first time homebuyer education, VA and or Reno events, and \n                                    more."; //анимация появления
 
-              var height = descr.getBoundingClientRect().height;
-              descr.style.height = '0';
-              descr.style.overflow = 'hidden';
-              var countHeight = 0;
+                var height = descr.getBoundingClientRect().height;
+                descr.style.height = '0';
+                descr.style.overflow = 'hidden';
+                var countHeight = 0;
 
-              var frame = function frame() {
-                descr.style.height = "".concat(countHeight += height / 50, "px");
+                var frame = function frame() {
+                  descr.style.height = "".concat(countHeight += height / 50, "px");
 
-                if (countHeight >= height) {
-                  descr.style.height = "".concat(height, "px");
-                  clearInterval(accordIn);
-                }
-              };
+                  if (countHeight >= height) {
+                    descr.style.height = "".concat(height, "px");
+                    clearInterval(accordIn);
+                  }
+                };
 
-              var accordIn = setInterval(frame, 10);
-            })();
-          } else {
-            (function () {
-              var descr = document.querySelector('.module__info-show ~ div'),
-                  height = descr.getBoundingClientRect().height;
-              var countHeight = height;
+                var accordIn = setInterval(frame, 10);
+              })();
+            } else {
+              (function () {
+                var descr = document.querySelectorAll('.module__info')[j].querySelector('.module__info-show ~ div'),
+                    height = descr.getBoundingClientRect().height;
+                var countHeight = height;
 
-              var frame = function frame() {
-                descr.style.height = "".concat(countHeight -= height / 50, "px");
+                var frame = function frame() {
+                  descr.style.height = "".concat(countHeight -= height / 50, "px");
 
-                if (countHeight <= 0) {
-                  descr.style.height = "0";
-                  clearInterval(accordOut);
-                  document.querySelector('.module__info').removeChild(descr);
-                }
-              };
+                  if (countHeight <= 0) {
+                    descr.style.height = "0";
+                    clearInterval(accordOut);
+                    document.querySelectorAll('.module__info')[j].removeChild(descr);
+                  }
+                };
 
-              var accordOut = setInterval(frame, 10);
-            })();
+                var accordOut = setInterval(frame, 10);
+              })();
+            }
+
+            break;
           }
-
-          break;
         }
+      };
+
+      for (var j = 0; j < btn.length; j++) {
+        _loop(j);
       }
     });
   }
