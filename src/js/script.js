@@ -10,7 +10,8 @@ window.addEventListener('DOMContentLoaded', () => {
         slider = require('./parts/slider'),
         teach = require('./parts/teach'),
         download = require('./parts/download'),
-        form = require('./parts/form');
+        form = require('./parts/form'),
+        phoneMask = require('./parts/phoneMask');
 
 
     //к навигации
@@ -33,8 +34,10 @@ window.addEventListener('DOMContentLoaded', () => {
             parseFloat(getComputedStyle(document.querySelectorAll(`.feed__slider .feed__item`)[1]).marginRight);
     }
     //к формам
-    let formJoin = document.querySelector('.join__evolution .form'),
+    const formJoin = document.querySelector('.join__evolution .form'),
         formSchedule = document.querySelector('.schedule__form .form');
+    //к телефонной маске
+    const phone = document.getElementById('phone');
     //подключение
     navigation(currentPage, teach);
     slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
@@ -43,4 +46,5 @@ window.addEventListener('DOMContentLoaded', () => {
     download();
     form(formJoin);
     form(formSchedule);
+    phoneMask(phone, 1);
 })

@@ -86,6 +86,374 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/fetch-polyfill/fetch.js":
+/*!**********************************************!*\
+  !*** ./node_modules/fetch-polyfill/fetch.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    var self = this
+    if (headers instanceof Headers) {
+      headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          self.append(name, value)
+        })
+      })
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        self.append(name, headers[name])
+      })
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  // Instead of iterable for now.
+  Headers.prototype.forEach = function(callback) {
+    var self = this
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      callback(name, self.map[name])
+    })
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return fetch.Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new fetch.Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return fetch.Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return fetch.Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return fetch.Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : fetch.Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(function (text) {
+          return JSON.parse(text);
+      });
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  var noXhrPatch =
+    typeof window !== 'undefined' && !!window.ActiveXObject &&
+      !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
+
+  function getXhr() {
+    // from backbone.js 1.1.2
+    // https://github.com/jashkenas/backbone/blob/1.1.2/backbone.js#L1181
+    if (noXhrPatch && !(/^(get|post|head|put|delete|options)$/i.test(this.method))) {
+      this.usingActiveXhr = true;
+      return new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    return new XMLHttpRequest();
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function(input, init) {
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
+
+    return new fetch.Promise(function(resolve, reject) {
+      var xhr = getXhr();
+      if (request.credentials === 'cors') {
+        xhr.withCredentials = true;
+      }
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      function onload() {
+        if (xhr.readyState !== 4) {
+          return
+        }
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+      xhr.onreadystatechange = onload;
+      if (!self.usingActiveXhr) {
+        xhr.onload = onload;
+        xhr.onerror = function() {
+          reject(new TypeError('Network request failed'))
+        }
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          xhr.setRequestHeader(name, value)
+        })
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  fetch.Promise = self.Promise; // you could change it to your favorite alternative
+  self.fetch.polyfill = true
+})();
+
+
+/***/ }),
+
 /***/ "./node_modules/formdata-polyfill/formdata.min.js":
 /*!********************************************************!*\
   !*** ./node_modules/formdata-polyfill/formdata.min.js ***!
@@ -207,30 +575,83 @@ module.exports = download;
 
 var form = function form(formBlock) {
   if (formBlock) {
-    var formBtn = formBlock.querySelector('.btn');
+    //маска на email и дату
+    var email = formBlock.querySelector('input[name="e-mail"]'),
+        date = formBlock.querySelector('input[name="date"]');
+    document.body.addEventListener('input', function (event) {
+      if (event.target == email) {
+        email.value = email.value.replace(/[а-яА-Яё]/, '');
+      } else if (date && event.target == date) {
+        date.value = date.value.replace(/[^\d\/\.]/, '');
+      }
+    });
 
     var sendForm = function sendForm(formBlock) {
       formBlock.addEventListener('submit', function (event) {
-        event.preventDefault(); //создаем данные в формате json
+        event.preventDefault();
 
-        var formData = new FormData(formBlock),
-            obj = {};
-        formData.forEach(function (value, key) {
-          obj[key] = value;
-        });
-        var json = JSON.stringify(obj); //отправляем форму
+        var resp = function resp(message) {
+          respMessage = document.createElement('p');
+          document.querySelector('.form__message-window').appendChild(respMessage);
+          respMessage.classList.add('form__message');
 
-        fetch('server.php', {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: json
-        }).then(function (response) {
-          if (response.status == 200) {} else {}
-        }).catch(function () {
-          console.error('Неуспех');
-        });
+          if (message == 'success') {
+            respMessage.innerHTML = 'Your data was successfully send!';
+          } else if (message == 'failure') {
+            respMessage.innerHTML = 'Error server! Try it later.';
+          }
+
+          document.querySelector('.overlay__form').style.display = 'flex';
+
+          var listener = function listener() {
+            document.querySelector('.overlay__form').style.display = 'none';
+            document.querySelector('.form__message-window').removeChild(respMessage);
+            document.body.removeEventListener('click', listener);
+          };
+
+          document.body.addEventListener('click', listener);
+        };
+
+        var countInput = 0;
+        formBlock.querySelectorAll('input').forEach(function (item) {
+          if (item.value != '') {
+            item.style.backgroundColor = 'rgba(216, 216, 216, 0.3)';
+            countInput++;
+          }
+        }); //если все инпуты заполнены, то отправляем форму
+
+        if (countInput == formBlock.querySelectorAll('input').length) {
+          //создаем данные в формате json
+          var formData = new FormData(formBlock),
+              obj = {};
+          formData.forEach(function (value, key) {
+            obj[key] = value;
+          });
+          var json = JSON.stringify(obj); //отправляем форму
+
+          fetch('server.php', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: json
+          }).then(function (response) {
+            if (response.status == 200) {
+              resp('success');
+            } else {
+              resp('failure');
+            }
+          }).catch(function () {
+            console.error('Неуспех');
+          });
+        } else {
+          //если не все инпуты заполнены, то помечаем их
+          formBlock.querySelectorAll('input').forEach(function (item) {
+            if (item.value == '') {
+              item.style.backgroundColor = 'rgba(207, 83, 83, 0.3)';
+            }
+          });
+        }
       });
     };
 
@@ -389,6 +810,157 @@ var navigation = function navigation(currentPage, teach) {
 };
 
 module.exports = navigation;
+
+/***/ }),
+
+/***/ "./src/js/parts/phoneMask.js":
+/*!***********************************!*\
+  !*** ./src/js/parts/phoneMask.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// Функция телефонной маски, аргументы: элемент, начальные цифры без +
+var phoneMask = function phoneMask(input, start) {
+  if (input) {
+    var string = '',
+        numStr = '';
+    var p = ('+' + start).length;
+    input.addEventListener('input', function () {
+      // Вводим только цифры, пробел и +
+      string = input.value;
+
+      while (/[^\d+]/.exec(string)) {
+        string = string.replace(/[^\d+]/, '');
+        input.value = string;
+      } // + может быть только на первой позиции
+
+
+      if (/\+/.exec(string) != null) {
+        if (/\+/.exec(string).index == 0) {
+          string = string.replace(/\+/g, '');
+          string = '+' + string;
+          input.value = string;
+        } else {
+          string = string.replace(/\+/g, '');
+          input.value = string;
+        }
+      } // строка в инпуте всегда показывает в начале +start
+
+
+      var reg = new RegExp('\\+' + start, '');
+
+      if (p < 2) {
+        console.log('ошибка');
+      }
+
+      if (reg.exec(string) == null || reg.exec(string).index != 0) {
+        if (p >= string.length) {
+          for (var i = 0; i < string.length; i++) {
+            if (string[i] != ('+' + start)[i]) {
+              string = string.replace(string, "+".concat(start, " ").concat(string.slice(i)));
+              input.value = string;
+              break;
+            }
+          }
+        } else {
+          for (var _i = 0; _i < p; _i++) {
+            if (string[_i] != ('+' + start)[_i]) {
+              string = string.replace(string, "+".concat(start, " ").concat(string.slice(_i)));
+              input.value = string;
+              break;
+            }
+          }
+        }
+      } else {
+        while (reg.exec(string) == null || reg.exec(string).index != 0) {
+          string = string.replace(string, "+".concat(start, " ").concat(string));
+        }
+
+        string = string.replace(string, "+".concat(start, " ").concat(string.slice(p)));
+        input.value = string;
+      } // количество чисел в инпуте меньше или равно 11
+
+
+      numStr = string.replace(/[^\d]/g, '');
+
+      if (numStr.length > 11) {
+        numStr = numStr.slice(0, 11);
+      } // внешний вид в зависимости от длины
+
+
+      if (numStr.length > 0 && numStr.length <= p - 1) {
+        string = "+".concat(numStr);
+        input.value = string;
+      }
+
+      if (numStr.length > p - 1 && numStr.length <= 4) {
+        string = numStr.replace(numStr, "+".concat(numStr.slice(0, p - 1), " (").concat(numStr.slice(p - 1), ")"));
+        input.value = string;
+      }
+
+      var numStr4 = numStr.slice(0, 4);
+
+      if (numStr.length > 4 && numStr.length <= 7) {
+        string = numStr.replace(/(\d{4})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2"));
+        input.value = string;
+      }
+
+      if (numStr.length > 7 && numStr.length <= 9) {
+        string = numStr.replace(/(\d{4})(\d{3})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2-$3"));
+        input.value = string;
+      }
+
+      if (numStr.length > 9 && numStr.length <= 11) {
+        string = numStr.replace(/(\d{4})(\d{3})(\d{2})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2-$3-$4"));
+        input.value = string;
+      }
+    }); // при нажатии backspace
+
+    input.addEventListener('keydown', function (event) {
+      if (event.keyCode == 8) {
+        event.preventDefault();
+        string = input.value;
+        numStr = string.replace(/[^\d]/g, '');
+        numStr = numStr.slice(0, numStr.length - 1);
+
+        if (numStr.length == 0) {
+          string = string.slice(0, string.length - 1);
+          input.value = string;
+        }
+
+        if (numStr.length > 0 && numStr.length <= p - 1) {
+          string = "+".concat(numStr);
+          input.value = string;
+        }
+
+        if (numStr.length > p - 1 && numStr.length <= 4) {
+          string = numStr.replace(numStr, "+".concat(numStr.slice(0, p - 1), " (").concat(numStr.slice(p - 1), ")"));
+          input.value = string;
+        }
+
+        var numStr4 = numStr.slice(0, 4);
+
+        if (numStr.length > 4 && numStr.length <= 7) {
+          string = numStr.replace(/(\d{4})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2"));
+          input.value = string;
+        }
+
+        if (numStr.length > 7 && numStr.length <= 9) {
+          string = numStr.replace(/(\d{4})(\d{3})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2-$3"));
+          input.value = string;
+        }
+
+        if (numStr.length > 9 && numStr.length <= 11) {
+          string = numStr.replace(/(\d{4})(\d{3})(\d{2})(\d*)/, "+".concat(numStr4.slice(0, p - 1), " (").concat(numStr4.slice(p - 1), ") $2-$3-$4"));
+          input.value = string;
+        }
+      }
+    });
+  }
+};
+
+module.exports = phoneMask;
 
 /***/ }),
 
@@ -607,6 +1179,8 @@ __webpack_require__(/*! nodelist-foreach-polyfill */ "./node_modules/nodelist-fo
 
 __webpack_require__(/*! formdata-polyfill */ "./node_modules/formdata-polyfill/formdata.min.js");
 
+__webpack_require__(/*! fetch-polyfill */ "./node_modules/fetch-polyfill/fetch.js");
+
 window.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
@@ -614,7 +1188,8 @@ window.addEventListener('DOMContentLoaded', function () {
       slider = __webpack_require__(/*! ./parts/slider */ "./src/js/parts/slider.js"),
       teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"),
       download = __webpack_require__(/*! ./parts/download */ "./src/js/parts/download.js"),
-      form = __webpack_require__(/*! ./parts/form */ "./src/js/parts/form.js"); //к навигации
+      form = __webpack_require__(/*! ./parts/form */ "./src/js/parts/form.js"),
+      phoneMask = __webpack_require__(/*! ./parts/phoneMask */ "./src/js/parts/phoneMask.js"); //к навигации
 
 
   var currentPage;
@@ -638,7 +1213,9 @@ window.addEventListener('DOMContentLoaded', function () {
 
 
   var formJoin = document.querySelector('.join__evolution .form'),
-      formSchedule = document.querySelector('.schedule__form .form'); //подключение
+      formSchedule = document.querySelector('.schedule__form .form'); //к телефонной маске
+
+  var phone = document.getElementById('phone'); //подключение
 
   navigation(currentPage, teach);
   slider('showup__content-slider', 'showup__content-slider .card', 'showup__content-btns', widthShowup, 'card-active');
@@ -647,6 +1224,7 @@ window.addEventListener('DOMContentLoaded', function () {
   download();
   form(formJoin);
   form(formSchedule);
+  phoneMask(phone, 1);
 });
 
 /***/ })
