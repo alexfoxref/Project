@@ -11,7 +11,8 @@ window.addEventListener('DOMContentLoaded', () => {
         teach = require('./parts/teach'),
         download = require('./parts/download'),
         form = require('./parts/form'),
-        phoneMask = require('./parts/phoneMask');
+        phoneMask = require('./parts/phoneMask'),
+        accordion = require('./parts/accordion');
 
 
     //к навигации
@@ -47,4 +48,5 @@ window.addEventListener('DOMContentLoaded', () => {
     form(formJoin);
     form(formSchedule);
     phoneMask(phone, 1);
+    accordion();
 })

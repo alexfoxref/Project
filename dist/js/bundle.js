@@ -534,6 +534,77 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/js/parts/accordion.js":
+/*!***********************************!*\
+  !*** ./src/js/parts/accordion.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var accordion = function accordion() {
+  var btn = document.querySelector('.module__info-show .plus__content');
+
+  if (btn) {
+    var count = 0;
+    document.body.addEventListener('click', function (event) {
+      for (var i = 0; i < btn.querySelectorAll('*').length; i++) {
+        if (event.target == btn || event.target == btn.querySelectorAll('*')[i]) {
+          count++;
+
+          if (count % 2 != 0) {
+            (function () {
+              var descr = document.createElement('div');
+              descr.classList.add('module__info-descr');
+              document.querySelector('.module__info').insertBefore(descr, document.querySelector('.module__info-show ~ hr'));
+              descr.textContent = "This module focuses on how to leverage your local muscle and \n                                generate leads in your local community. Topics include areas to develop \n                                like: your local gym, church, favorite local restaurant or bar, etc.. \n                                Along with local business networking groups, community involvement and \n                                charity work, local businesses (lender express and lender advantage), local \n                                lunch n learns, first time homebuyer education, VA and or Reno events, and \n                                more."; //анимация появления
+
+              var height = descr.getBoundingClientRect().height;
+              descr.style.height = '0';
+              descr.style.overflow = 'hidden';
+              var countHeight = 0;
+
+              var frame = function frame() {
+                descr.style.height = "".concat(countHeight += height / 50, "px");
+
+                if (countHeight >= height) {
+                  descr.style.height = "".concat(height, "px");
+                  clearInterval(accordIn);
+                }
+              };
+
+              var accordIn = setInterval(frame, 10);
+            })();
+          } else {
+            (function () {
+              var descr = document.querySelector('.module__info-show ~ div'),
+                  height = descr.getBoundingClientRect().height;
+              var countHeight = height;
+
+              var frame = function frame() {
+                descr.style.height = "".concat(countHeight -= height / 50, "px");
+
+                if (countHeight <= 0) {
+                  descr.style.height = "0";
+                  clearInterval(accordOut);
+                  document.querySelector('.module__info').removeChild(descr);
+                }
+              };
+
+              var accordOut = setInterval(frame, 10);
+            })();
+          }
+
+          break;
+        }
+      }
+    });
+  }
+};
+
+module.exports = accordion;
+
+/***/ }),
+
 /***/ "./src/js/parts/download.js":
 /*!**********************************!*\
   !*** ./src/js/parts/download.js ***!
@@ -1189,7 +1260,8 @@ window.addEventListener('DOMContentLoaded', function () {
       teach = __webpack_require__(/*! ./parts/teach */ "./src/js/parts/teach.js"),
       download = __webpack_require__(/*! ./parts/download */ "./src/js/parts/download.js"),
       form = __webpack_require__(/*! ./parts/form */ "./src/js/parts/form.js"),
-      phoneMask = __webpack_require__(/*! ./parts/phoneMask */ "./src/js/parts/phoneMask.js"); //к навигации
+      phoneMask = __webpack_require__(/*! ./parts/phoneMask */ "./src/js/parts/phoneMask.js"),
+      accordion = __webpack_require__(/*! ./parts/accordion */ "./src/js/parts/accordion.js"); //к навигации
 
 
   var currentPage;
@@ -1225,6 +1297,7 @@ window.addEventListener('DOMContentLoaded', function () {
   form(formJoin);
   form(formSchedule);
   phoneMask(phone, 1);
+  accordion();
 });
 
 /***/ })
