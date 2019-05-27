@@ -31,6 +31,7 @@ let play = () => {
         iframe.setAttribute('allow', 'autoplay; encrypted-media');
         iframe.setAttribute('heiallowfullscreenght', '');
         iframe.setAttribute('autoplay', '0');
+        iframe.setAttribute('enablejsapi', '1');
         if (window.location.href.match(/modules\.html/)) {
             iframe.setAttribute('autoplay', '1');
         }
@@ -79,9 +80,7 @@ let play = () => {
                         </div>
                         <div class="play__text">play video</div>
                     `;
-                    document.querySelectorAll('.module__video-item')[numBtn + 1].appendChild(block);
-                    console.log(block);
-        
+                    document.querySelectorAll('.module__video-item')[numBtn + 1].appendChild(block);        
                     btns = document.querySelectorAll('.play__circle');
                     blocks = document.querySelectorAll('.play');
                 }

@@ -114,25 +114,34 @@ let slider = (slider, card, control, width, active) => {
             let moveNextAnimation = setInterval(frameNext, 10);
         }
     }
+
+    let autoSlider;
+    let moveAuto = () => {
+        if (sliderWin && card == 'modules__content-slider .card') {
+            autoSlider = setInterval(() => {
+                if (sliderWin.classList.contains('auto') && !controlWin.classList.contains('onmove')) {
+                    moveSlide(-1);
+                }
+            }, 4000);
+        }
+    }
+    moveAuto();
     //если слайды есть и на кнопках не висит onmove, то по клику на кнопки перемещаем слайды
     if (document.querySelectorAll(`.${card}`).length > 0) {
         controlWin.addEventListener('click', event => {
             if (!controlWin.classList.contains('onmove')) {
                 clickElem(controlWin.querySelector('.slick-prev'), () => {
                     moveSlide(1);
+                    clearInterval(autoSlider);
+                    moveAuto();
                 });
                 clickElem(controlWin.querySelector('.slick-next'), () => {
                     moveSlide(-1);
+                    clearInterval(autoSlider);
+                    moveAuto();
                 });
             }
         });
-    }
-    if (sliderWin && card == 'modules__content-slider .card') {
-        let autoSlider = setInterval(() => {
-            if (sliderWin.classList.contains('auto') && !controlWin.classList.contains('onmove')) {
-                moveSlide(-1);
-            }
-        }, 4000);
     }
 }
 

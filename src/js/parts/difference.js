@@ -53,7 +53,6 @@ let difference = column => {
                     margin = column.children[1].getBoundingClientRect().top - column.children[0].getBoundingClientRect().bottom;
                     let position = margin;
                     let lastCardOpacity = 1;
-                    // console.log(margin, moveLength);
                     let firstFrame = () => {
                         column.lastChild.style.marginTop = `${position += (margin + moveLength)/30}px`;
                         if (n == 4) {column.lastChild.style.opacity = `${lastCardOpacity -= 1/30}`};
