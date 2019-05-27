@@ -1184,31 +1184,96 @@ module.exports = phoneMask;
 /***/ (function(module, exports) {
 
 var play = function play() {
-  var btns = document.querySelectorAll('.play'),
+  var btns = document.querySelectorAll('.play__circle'),
+      blocks = document.querySelectorAll('.play'),
       overlay = document.querySelector('.overlay');
-  var video;
+  var numBtn; //подключаем iframe api и создаем плеер
 
-  if (btns.length != 0) {
-    document.body.addEventListener('click', function (event) {
-      for (var i = 0; i < btns.length; i++) {
-        for (var j = 0; j < btns[i].querySelectorAll('*').length; j++) {
-          if (event.target == btns[i] || event.target == btns[i].querySelectorAll('*')[j]) {
-            overlay.style.display = 'flex';
-            overlay.querySelector('iframe').setAttribute('src', btns[i].getAttribute('data-url'));
-            video = document.querySelector('video');
-            console.log(video);
-          }
-        }
-      }
+  var player;
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-      if (event.target == overlay.querySelector('.close')) {
-        overlay.style.display = 'none';
-        overlay.querySelector('iframe').setAttribute('src', 'none');
+  window.onYouTubeIframeAPIReady = function () {
+    console.log('onYouTubeIframeAPIReady');
+    player = new YT.Player('frame', {
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
       }
     });
+  };
 
-    if (window.location.href.match(/modules\.html/)) {}
-  }
+  var onPlayerReady = function onPlayerReady(e) {
+    console.log('onPlayerReady');
+    var iframe = player.getIframe();
+    iframe.setAttribute('width', '720');
+    iframe.setAttribute('height', '480');
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('allow', 'autoplay; encrypted-media');
+    iframe.setAttribute('heiallowfullscreenght', '');
+    iframe.setAttribute('autoplay', '0');
+
+    if (window.location.href.match(/modules\.html/)) {
+      iframe.setAttribute('autoplay', '1');
+    }
+
+    if (btns.length != 0) {
+      document.body.addEventListener('click', function (event) {
+        for (var i = 0; i < btns.length; i++) {
+          for (var j = 0; j < btns[i].querySelectorAll('*').length; j++) {
+            if (event.target == btns[i] || event.target == btns[i].querySelectorAll('*')[j]) {
+              if (!btns[i].classList.contains('closed')) {
+                overlay.style.display = 'flex';
+                numBtn = i; // overlay.querySelector('iframe').setAttribute('src', btns[i].getAttribute('data-url'));
+
+                player.loadVideoByUrl("".concat(blocks[i].getAttribute('data-url')));
+
+                if (iframe.getAttribute('autoplay') == '0') {
+                  e.target.stopVideo();
+                }
+
+                break;
+              }
+            }
+          }
+        }
+
+        if (event.target == overlay.querySelector('.close')) {
+          overlay.style.display = 'none'; // overlay.querySelector('iframe').setAttribute('src', 'none');
+
+          player.stopVideo();
+        }
+      });
+    }
+  };
+
+  var onPlayerStateChange = function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.ENDED) {
+      console.log('+');
+
+      if (window.location.href.match(/modules\.html/)) {
+        console.log('++');
+
+        if (document.querySelectorAll('.module__video-item')[numBtn + 1] && btns[numBtn + 1].classList.contains('closed')) {
+          console.log('+++');
+          document.querySelectorAll('.module__video-item')[numBtn + 1].style.filter = 'none';
+          document.querySelectorAll('.module__video-item')[numBtn + 1].style.opacity = '1';
+          var dataUrl = blocks[numBtn + 1].getAttribute('data-url');
+          document.querySelectorAll('.module__video-item')[numBtn + 1].removeChild(blocks[numBtn + 1]);
+          var block = document.createElement('div');
+          block.classList.add('play');
+          block.setAttribute('data-url', "".concat(dataUrl));
+          block.innerHTML = "\n                        <div class=\"play__circle\">\n                            <svg viewBox=\"0 0 14 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                                <path d=\"M14 8L0 16V0L14 8Z\" fill=\"#6D53AF\"/>\n                            </svg>\n                        </div>\n                        <div class=\"play__text\">play video</div>\n                    ";
+          document.querySelectorAll('.module__video-item')[numBtn + 1].appendChild(block);
+          console.log(block);
+          btns = document.querySelectorAll('.play__circle');
+          blocks = document.querySelectorAll('.play');
+        }
+      }
+    }
+  };
 };
 
 module.exports = play;
