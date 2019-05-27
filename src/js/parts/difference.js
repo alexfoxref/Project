@@ -11,6 +11,7 @@ let difference = column => {
                 margin,
                 moveLength;
             card.classList.add('officer__card-item');
+            //начальная позиция создается без анимации
             if (n == 1) {
                 card.innerHTML = `
                 <div class="card__counter">
@@ -47,6 +48,7 @@ let difference = column => {
             } else if (n > 1 && n <= 4) {
                 //функция добавления карточек с анимацией
                 let cardMove = n => {
+                    column.classList.add('onmove');
                     moveLength = column.children[1].getBoundingClientRect().height;
                     margin = column.children[1].getBoundingClientRect().top - column.children[0].getBoundingClientRect().bottom;
                     let position = margin;
@@ -92,6 +94,7 @@ let difference = column => {
                                         column.lastChild.style.opacity = `0`;
                                         column.removeChild(column.lastChild);
                                     }
+                                    column.classList.remove('onmove');
                                 }
                             }
                             let secondMove = setInterval(secondFrame, 10);
@@ -110,7 +113,10 @@ let difference = column => {
             for (let i = 0; i < column.querySelectorAll('.plus *').length; i++) {
                 if (event.target == column.querySelector('.plus') || 
                         event.target == column.querySelectorAll('.plus *')[i]) {
-                    createCard(column.children.length);
+                    //запрещаем быстрые нажатия
+                    if (!column.classList.contains('onmove')) {
+                        createCard(column.children.length);
+                    }
                     break;
                 }
             }

@@ -13,7 +13,8 @@ window.addEventListener('DOMContentLoaded', () => {
         form = require('./parts/form'),
         phoneMask = require('./parts/phoneMask'),
         accordion = require('./parts/accordion'),
-        difference = require('./parts/difference');
+        difference = require('./parts/difference'),
+        play = require('./parts/play');
 
 
     //к навигации
@@ -55,4 +56,5 @@ window.addEventListener('DOMContentLoaded', () => {
     accordion();
     difference(officerold);
     difference(officernew);
+    play();
 })

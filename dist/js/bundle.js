@@ -542,7 +542,7 @@ module.exports = g;
 /***/ (function(module, exports) {
 
 var accordion = function accordion() {
-  var btn = document.querySelectorAll('.module__info-show .plus__content');
+  var btn = document.querySelectorAll('.module__info-show .plus');
 
   if (btn.length != 0) {
     var count = [];
@@ -555,52 +555,59 @@ var accordion = function accordion() {
       var _loop = function _loop(j) {
         for (var _i = 0; _i < btn[j].querySelectorAll('*').length; _i++) {
           if (event.target == btn[j] || event.target == btn[j].querySelectorAll('*')[_i]) {
-            count[j]++;
+            //запрещаем быстрые нажатия
+            if (!btn[j].classList.contains('onmove')) {
+              count[j]++;
 
-            if (count[j] % 2 != 0) {
-              (function () {
-                var descr = document.createElement('div');
-                descr.classList.add('module__info-descr');
-                document.querySelectorAll('.module__info')[j].insertBefore(descr, document.querySelectorAll('.module__info-show ~ hr')[j]);
-                descr.textContent = "This module focuses on how to leverage your local muscle and \n                                    generate leads in your local community. Topics include areas to develop \n                                    like: your local gym, church, favorite local restaurant or bar, etc.. \n                                    Along with local business networking groups, community involvement and \n                                    charity work, local businesses (lender express and lender advantage), local \n                                    lunch n learns, first time homebuyer education, VA and or Reno events, and \n                                    more."; //анимация появления
+              if (count[j] % 2 != 0) {
+                (function () {
+                  btn[j].classList.add('onmove');
+                  var descr = document.createElement('div');
+                  descr.classList.add('module__info-descr');
+                  document.querySelectorAll('.module__info')[j].insertBefore(descr, document.querySelectorAll('.module__info-show ~ hr')[j]);
+                  descr.textContent = "This module focuses on how to leverage your local muscle and \n                                        generate leads in your local community. Topics include areas to develop \n                                        like: your local gym, church, favorite local restaurant or bar, etc.. \n                                        Along with local business networking groups, community involvement and \n                                        charity work, local businesses (lender express and lender advantage), local \n                                        lunch n learns, first time homebuyer education, VA and or Reno events, and \n                                        more."; //анимация появления
 
-                var height = descr.getBoundingClientRect().height;
-                descr.style.height = '0';
-                descr.style.overflow = 'hidden';
-                var countHeight = 0;
+                  var height = descr.getBoundingClientRect().height;
+                  descr.style.height = '0';
+                  descr.style.overflow = 'hidden';
+                  var countHeight = 0;
 
-                var frame = function frame() {
-                  descr.style.height = "".concat(countHeight += height / 30, "px");
+                  var frame = function frame() {
+                    descr.style.height = "".concat(countHeight += height / 30, "px");
 
-                  if (countHeight >= height) {
-                    descr.style.height = "".concat(height, "px");
-                    clearInterval(accordIn);
-                  }
-                };
+                    if (countHeight >= height) {
+                      descr.style.height = "".concat(height, "px");
+                      clearInterval(accordIn);
+                      btn[j].classList.remove('onmove');
+                    }
+                  };
 
-                var accordIn = setInterval(frame, 10);
-              })();
-            } else {
-              (function () {
-                var descr = document.querySelectorAll('.module__info')[j].querySelector('.module__info-show ~ div'),
-                    height = descr.getBoundingClientRect().height;
-                var countHeight = height;
+                  var accordIn = setInterval(frame, 10);
+                })();
+              } else {
+                (function () {
+                  btn[j].classList.add('onmove');
+                  var descr = document.querySelectorAll('.module__info')[j].querySelector('.module__info-show ~ div'),
+                      height = descr.getBoundingClientRect().height;
+                  var countHeight = height;
 
-                var frame = function frame() {
-                  descr.style.height = "".concat(countHeight -= height / 30, "px");
+                  var frame = function frame() {
+                    descr.style.height = "".concat(countHeight -= height / 30, "px");
 
-                  if (countHeight <= 0) {
-                    descr.style.height = "0";
-                    clearInterval(accordOut);
-                    document.querySelectorAll('.module__info')[j].removeChild(descr);
-                  }
-                };
+                    if (countHeight <= 0) {
+                      descr.style.height = "0";
+                      clearInterval(accordOut);
+                      document.querySelectorAll('.module__info')[j].removeChild(descr);
+                      btn[j].classList.remove('onmove');
+                    }
+                  };
 
-                var accordOut = setInterval(frame, 10);
-              })();
+                  var accordOut = setInterval(frame, 10);
+                })();
+              }
+
+              break;
             }
-
-            break;
           }
         }
       };
@@ -635,7 +642,7 @@ var difference = function difference(column) {
       var card = document.createElement('div'),
           margin,
           moveLength;
-      card.classList.add('officer__card-item');
+      card.classList.add('officer__card-item'); //начальная позиция создается без анимации
 
       if (n == 1) {
         card.innerHTML = "\n                <div class=\"card__counter\">\n                    <svg width=\"18\" height=\"26\" viewBox=\"0 0 18 26\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                        <g opacity=\"0.34\" filter=\"url(#filter0_d)\">\n                        <path d=\"M4.824 11.6716V7.37561H6.048C8.12 7.37561 9.156 6.85161 9.156 5.80361C9.156 4.79561 8.128 4.28361 6.072 4.26761C5.44 4.26761 4.86 4.29961 4.332 4.36361L4.116 0.619608C4.9 0.515608 5.764 0.463608 6.708 0.463608C8.772 0.463608 10.384 0.907609 11.544 1.79561C12.712 2.68361 13.296 3.89161 13.296 5.41961C13.296 6.75561 12.88 7.85161 12.048 8.70761C11.216 9.55561 10.008 10.1316 8.424 10.4356L8.34 11.6716H4.824ZM6.576 12.9436C7.232 12.9436 7.804 13.1876 8.292 13.6756C8.788 14.1636 9.036 14.7396 9.036 15.4036C9.036 16.0756 8.788 16.6636 8.292 17.1676C7.804 17.6636 7.232 17.9116 6.576 17.9116C5.904 17.9116 5.32 17.6676 4.824 17.1796C4.336 16.6836 4.092 16.0956 4.092 15.4156C4.092 14.7516 4.336 14.1756 4.824 13.6876C5.32 13.1916 5.904 12.9436 6.576 12.9436Z\" fill=\"#BEBEBE\"/>\n                        </g>\n                        <defs>\n                        <filter id=\"filter0_d\" x=\"0.0917969\" y=\"0.463867\" width=\"17.204\" height=\"25.448\" filterUnits=\"userSpaceOnUse\" color-interpolation-filters=\"sRGB\">\n                        <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/>\n                        <feColorMatrix in=\"SourceAlpha\" type=\"matrix\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/>\n                        <feOffset dy=\"4\"/>\n                        <feGaussianBlur stdDeviation=\"2\"/>\n                        <feColorMatrix type=\"matrix\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0\"/>\n                        <feBlend mode=\"normal\" in2=\"BackgroundImageFix\" result=\"effect1_dropShadow\"/>\n                        <feBlend mode=\"normal\" in=\"SourceGraphic\" in2=\"effect1_dropShadow\" result=\"shape\"/>\n                        </filter>\n                        </defs>\n                    </svg>\n                </div>\n                <div class=\"card__click\">\n                    <div>Click to show </div>\n                    <div class=\"plus\">\n                        <div class=\"plus__content\">\n                            <svg viewBox=\"0 0 12 12\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                                <path d=\"M5.16699 1.00033C5.16699 0.540088 5.54009 0.166992 6.00033 0.166992C6.46056 0.166992 6.83366 0.540088 6.83366 1.00033V11.0003C6.83366 11.4606 6.46056 11.8337 6.00033 11.8337C5.54009 11.8337 5.16699 11.4606 5.16699 11.0003V1.00033Z\" fill=\"white\"/>\n                                <path d=\"M1.00033 6.83366C0.540088 6.83366 0.166992 6.46056 0.166992 6.00033C0.166992 5.54009 0.540088 5.16699 1.00033 5.16699H11.0003C11.4606 5.16699 11.8337 5.54009 11.8337 6.00033C11.8337 6.46056 11.4606 6.83366 11.0003 6.83366H1.00033Z\" fill=\"white\"/>\n                            </svg>\n                        </div>\n                    </div>\n                </div>\n                ";
@@ -643,6 +650,7 @@ var difference = function difference(column) {
       } else if (n > 1 && n <= 4) {
         //функция добавления карточек с анимацией
         var cardMove = function cardMove(n) {
+          column.classList.add('onmove');
           moveLength = column.children[1].getBoundingClientRect().height;
           margin = column.children[1].getBoundingClientRect().top - column.children[0].getBoundingClientRect().bottom;
           var position = margin;
@@ -701,6 +709,8 @@ var difference = function difference(column) {
                     column.lastChild.style.opacity = "0";
                     column.removeChild(column.lastChild);
                   }
+
+                  column.classList.remove('onmove');
                 }
               };
 
@@ -720,7 +730,11 @@ var difference = function difference(column) {
     document.body.addEventListener('click', function (event) {
       for (var i = 0; i < column.querySelectorAll('.plus *').length; i++) {
         if (event.target == column.querySelector('.plus') || event.target == column.querySelectorAll('.plus *')[i]) {
-          createCard(column.children.length);
+          //запрещаем быстрые нажатия
+          if (!column.classList.contains('onmove')) {
+            createCard(column.children.length);
+          }
+
           break;
         }
       }
@@ -1162,6 +1176,45 @@ module.exports = phoneMask;
 
 /***/ }),
 
+/***/ "./src/js/parts/play.js":
+/*!******************************!*\
+  !*** ./src/js/parts/play.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var play = function play() {
+  var btns = document.querySelectorAll('.play'),
+      overlay = document.querySelector('.overlay');
+  var video;
+
+  if (btns.length != 0) {
+    document.body.addEventListener('click', function (event) {
+      for (var i = 0; i < btns.length; i++) {
+        for (var j = 0; j < btns[i].querySelectorAll('*').length; j++) {
+          if (event.target == btns[i] || event.target == btns[i].querySelectorAll('*')[j]) {
+            overlay.style.display = 'flex';
+            overlay.querySelector('iframe').setAttribute('src', btns[i].getAttribute('data-url'));
+            video = document.querySelector('video');
+            console.log(video);
+          }
+        }
+      }
+
+      if (event.target == overlay.querySelector('.close')) {
+        overlay.style.display = 'none';
+        overlay.querySelector('iframe').setAttribute('src', 'none');
+      }
+    });
+
+    if (window.location.href.match(/modules\.html/)) {}
+  }
+};
+
+module.exports = play;
+
+/***/ }),
+
 /***/ "./src/js/parts/slider.js":
 /*!********************************!*\
   !*** ./src/js/parts/slider.js ***!
@@ -1389,7 +1442,8 @@ window.addEventListener('DOMContentLoaded', function () {
       form = __webpack_require__(/*! ./parts/form */ "./src/js/parts/form.js"),
       phoneMask = __webpack_require__(/*! ./parts/phoneMask */ "./src/js/parts/phoneMask.js"),
       accordion = __webpack_require__(/*! ./parts/accordion */ "./src/js/parts/accordion.js"),
-      difference = __webpack_require__(/*! ./parts/difference */ "./src/js/parts/difference.js"); //к навигации
+      difference = __webpack_require__(/*! ./parts/difference */ "./src/js/parts/difference.js"),
+      play = __webpack_require__(/*! ./parts/play */ "./src/js/parts/play.js"); //к навигации
 
 
   var currentPage;
@@ -1431,6 +1485,7 @@ window.addEventListener('DOMContentLoaded', function () {
   accordion();
   difference(officerold);
   difference(officernew);
+  play();
 });
 
 /***/ })
