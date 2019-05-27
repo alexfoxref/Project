@@ -255,6 +255,16 @@ a {
       letter-spacing: -1.16px;
       color: #2546bc; }
 
+.close__pdf {
+  color: #cacaca;
+  font-size: 60px;
+  position: fixed;
+  top: 10%;
+  right: 10%;
+  cursor: pointer; }
+  .close__pdf:hover {
+    color: #eaeaea; }
+
 .showup {
   position: relative;
   height: 100%;
