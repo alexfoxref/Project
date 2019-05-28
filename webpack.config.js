@@ -31,8 +31,7 @@ module.exports = {
                   ie: "10"
                 }
               }]
-            ],
-            plugins: ["es6-promise"]
+            ]
           }
         }
       }
