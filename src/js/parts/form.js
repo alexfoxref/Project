@@ -50,21 +50,42 @@ let form = (formBlock) => {
                     });
                     let json = JSON.stringify(obj);
                     //отправляем форму
-                    fetch('server.php',{
-                            method: "POST",
-                            headers: {'Content-Type': 'application/json'},
-                            body: json
-                    })
-                        .then(response => {
-                            if (response.status == 200) {
-                                resp('success');
-                            } else {
-                                resp('failure');
-                            }
+                    let postData = (data) => {
+                        return new Promise((resolve, reject) => {
+                            let request = new XMLHttpRequest();
+        
+                            request.open('POST', 'server.php');
+                            request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                            request.addEventListener('readystatechange', () => {
+                
+                                if (request.readyState === 4) {
+                                    if (request.status == 200) {
+                                        resolve('success');
+                                    } else {
+                                        reject('failure');
+                                    }
+                                } 
+                            });
+        
+                            request.send(data);
                         })
-                        .catch(() => {
-                            console.error('Неуспех');
-                        })
+                    }
+
+                    postData(json)
+                        .then(response => resp(response))
+                    // fetch('server.php',{
+                    //         method: "POST",
+                    //         headers: {'Content-Type': 'application/json'},
+                    //         body: json
+                    // })
+                    //     .then(response => {
+                    //         if (response.status == 200) {
+                    //             resp('success');
+                    //         } else {
+                    //             resp('failure');
+                    //         }
+                    //     })
+                        .catch((err) => resp(err));
                 } else {
                     //если не все инпуты заполнены, то помечаем их
                     formBlock.querySelectorAll('input').forEach(item => {
