@@ -66,7 +66,6 @@ let play = () => {
             if (window.location.href.match(/modules\.html/)) {
                 if (document.querySelectorAll('.module__video-item')[numBtn + 1] && btns[numBtn + 1].classList.contains('closed')) {
                     document.querySelectorAll('.module__video-item')[numBtn + 1].style.filter = 'none';
-                    document.querySelectorAll('.module__video-item')[numBtn + 1].style.opacity = '1';
                     let dataUrl = blocks[numBtn + 1].getAttribute('data-url');
                     document.querySelectorAll('.module__video-item')[numBtn + 1].removeChild(blocks[numBtn + 1]);
                     let block = document.createElement('div');
