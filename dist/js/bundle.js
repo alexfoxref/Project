@@ -1820,7 +1820,9 @@ module.exports = download;
   !*** ./src/js/parts/form.js ***!
   \******************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var _Promise = typeof Promise === 'undefined' ? __webpack_require__(/*! es6-promise */ "./node_modules/es6-promise/dist/es6-promise.js").Promise : Promise;
 
 var form = function form(formBlock) {
   if (formBlock) {
@@ -1879,7 +1881,7 @@ var form = function form(formBlock) {
           var json = JSON.stringify(obj); //отправляем форму
 
           var postData = function postData(data) {
-            return new Promise(function (resolve, reject) {
+            return new _Promise(function (resolve, reject) {
               var request = new XMLHttpRequest();
               request.open('POST', 'server.php');
               request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
@@ -2544,8 +2546,6 @@ module.exports = teach;
 __webpack_require__(/*! nodelist-foreach-polyfill */ "./node_modules/nodelist-foreach-polyfill/index.js");
 
 __webpack_require__(/*! formdata-polyfill */ "./node_modules/formdata-polyfill/formdata.min.js");
-
-__webpack_require__(/*! es6-promise */ "./node_modules/es6-promise/dist/es6-promise.js");
 
 window.addEventListener('DOMContentLoaded', function () {
   'use strict';
