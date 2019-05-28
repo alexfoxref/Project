@@ -79,10 +79,7 @@ let navigation = (currentPage, teach) => {
                     icon.querySelectorAll('*').forEach(item => {
                         if (event.target == icon || event.target == item) {
                             event.preventDefault();
-                            let link = document.createElement('a');
-                            link.setAttribute('href', 'index.html');
-                            link.click();
-                            link.remove();
+                            window.location = 'index.html';
                         }
                     });
 
@@ -105,10 +102,7 @@ let navigation = (currentPage, teach) => {
         document.body.addEventListener('click', event => {
             plus.querySelectorAll('*').forEach(item => {
                 if (event.target == item || event.target == plus) {
-                    let link = document.createElement('a');
-                    link.setAttribute('href', 'modules.html');
-                    link.click();
-                    link.remove();
+                    window.location = 'modules.html';
                 }
             })
         });
@@ -120,10 +114,7 @@ let navigation = (currentPage, teach) => {
                         if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
                             event.preventDefault();
                             let pageLink = +itemCard.getAttribute('href').slice(-1);
-                            let link = document.createElement('a');
-                            link.setAttribute('href', `modules.html#${pageLink}`);
-                            link.click();
-                            link.remove();
+                            window.location = `modules.html#${pageLink}`;
                             break;
                         }
                     }

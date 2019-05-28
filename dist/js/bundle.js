@@ -984,10 +984,7 @@ var navigation = function navigation(currentPage, teach) {
           icon.querySelectorAll('*').forEach(function (item) {
             if (event.target == icon || event.target == item) {
               event.preventDefault();
-              var link = document.createElement('a');
-              link.setAttribute('href', 'index.html');
-              link.click();
-              link.remove();
+              window.location = 'index.html';
             }
           });
           var arrow = sidecontrol[currentPage - 1].querySelectorAll('a')[1];
@@ -1011,10 +1008,7 @@ var navigation = function navigation(currentPage, teach) {
     document.body.addEventListener('click', function (event) {
       plus.querySelectorAll('*').forEach(function (item) {
         if (event.target == item || event.target == plus) {
-          var link = document.createElement('a');
-          link.setAttribute('href', 'modules.html');
-          link.click();
-          link.remove();
+          window.location = 'modules.html';
         }
       });
     }); // переход по слайдам на слайдере первого экрана
@@ -1026,10 +1020,7 @@ var navigation = function navigation(currentPage, teach) {
             if (event.target == itemCard || event.target == itemCard.querySelectorAll('*')[i]) {
               event.preventDefault();
               var pageLink = +itemCard.getAttribute('href').slice(-1);
-              var link = document.createElement('a');
-              link.setAttribute('href', "modules.html#".concat(pageLink));
-              link.click();
-              link.remove();
+              window.location = "modules.html#".concat(pageLink);
               break;
             }
           }
