@@ -1,6 +1,5 @@
 require('nodelist-foreach-polyfill');
 require('formdata-polyfill');
-require('es6-promise');
 
 window.addEventListener('DOMContentLoaded', () => {
 
